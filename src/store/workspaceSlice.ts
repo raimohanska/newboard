@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Workspace, CanvasItem } from '../types';
+import { loadWorkspace } from '../utils/storage';
 
 interface WorkspaceState extends Workspace {
   selectedIds: string[];
 }
 
+const loadedWorkspace = loadWorkspace();
+
 const initialState: WorkspaceState = {
-  items: {},
+  items: loadedWorkspace?.items || {},
   selectedIds: [],
 };
 
