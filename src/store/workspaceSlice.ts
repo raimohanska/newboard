@@ -4,6 +4,13 @@ import { loadWorkspace } from '../utils/storage';
 
 interface WorkspaceState extends Workspace {
   selectedIds: string[];
+  selectionBox: {
+    isActive: boolean;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+  };
 }
 
 const loadedWorkspace = loadWorkspace();
@@ -11,6 +18,13 @@ const loadedWorkspace = loadWorkspace();
 const initialState: WorkspaceState = {
   items: loadedWorkspace?.items || {},
   selectedIds: [],
+  selectionBox: {
+    isActive: false,
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0,
+  },
 };
 
 const workspaceSlice = createSlice({
@@ -69,6 +83,20 @@ const workspaceSlice = createSlice({
         state.items[item.id] = item;
       });
     },
+    startSelectionBox: (state: WorkspaceState, action: PayloadAction<{ x: number; y: number }>) => {
+      state.selectionBox.isActive = true;
+      state.selectionBox.startX = action.payload.x;
+      state.selectionBox.startY = action.payload.y;
+      state.selectionBox.endX = action.payload.x;
+      state.selectionBox.endY = action.payload.y;
+    },
+    updateSelectionBox: (state: WorkspaceState, action: PayloadAction<{ x: number; y: number }>) => {
+      state.selectionBox.endX = action.payload.x;
+      state.selectionBox.endY = action.payload.y;
+    },
+    endSelectionBox: (state: WorkspaceState) => {
+      state.selectionBox.isActive = false;
+    },
   },
 });
 
@@ -83,6 +111,9 @@ export const {
   clearSelection,
   selectMultipleItems,
   bulkCreateItems,
+  startSelectionBox,
+  updateSelectionBox,
+  endSelectionBox,
 } = workspaceSlice.actions;
 export default workspaceSlice.reducer;
 
