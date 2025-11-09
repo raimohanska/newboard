@@ -2,6 +2,7 @@
 
 1. Make sure your root component is not re-rendered unnecessarily. In this case, Canvas must not re-render when a Note is moved. For this, it must only use the list of item ids from the store.
 2. Make sure your memoizations actually take effect. It's all too easy to imagine they work, while everything actually gets re-rendered because, for instance, two arrays are not equal by `===` even if they have the same contents etc. Use `fast-deep-equal` or similar for comparing objects. In Redux, you can use `createSelector` with `memoizeOptions`.
+3. If you need some state in event handlers, consider taking the state directly from your state store in the handler, instead of using `useSelector`. Otherwise your component will render whenever this state changes, even though you only need the data in an event handler.
 
 
 ## Performance measurements

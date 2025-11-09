@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { moveSelectedItems, updateItemContent, selectItem, toggleSelection } from '../store/workspaceSlice';
 import { RootState } from '../store';
 import type { Note as NoteType } from '../types';
+import { increaseRenderCount } from '../utils/renderCounts';
 
 const NoteContainer = styled.div<{ $isDragging: boolean; $isSelected: boolean }>`
   position: absolute;
@@ -43,11 +44,11 @@ interface NoteProps {
 }
 
 export const Note = ({ noteId }: NoteProps) => {
-  //increaseRenderCount('Note');
+  increaseRenderCount('Note');
   const dispatch = useDispatch();
+  const store = useStore<RootState>();
   const note = useSelector((state: RootState) => state.workspace.items[noteId] as NoteType);
   const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
-  const zoom = useSelector((state: RootState) => state.workspace.zoom);
   const isSelected = selectedIds.includes(noteId);
   
   if (!note) return null;
@@ -79,6 +80,9 @@ export const Note = ({ noteId }: NoteProps) => {
     if (!isDragging) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      // Get zoom from store at interaction time (not reactive)
+      const zoom = store.getState().workspace.zoom;
+      
       const delta = {
         x: (e.clientX - lastMousePosRef.current.x) / zoom,
         y: (e.clientY - lastMousePosRef.current.y) / zoom,
@@ -103,7 +107,7 @@ export const Note = ({ noteId }: NoteProps) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, isSelected, zoom, dispatch]);
+  }, [isDragging, isSelected, store, dispatch]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     dispatch(updateItemContent({
