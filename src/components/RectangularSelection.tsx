@@ -27,25 +27,8 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
   useEffect(() => {
     if (!isSelecting) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (!rect) return;
-
-      const x = e.clientX - rect.left + (canvasRef.current?.parentElement?.scrollLeft || 0);
-      const y = e.clientY - rect.top + (canvasRef.current?.parentElement?.scrollTop || 0);
-      
-      dispatch(updateSelectionBox({ x, y }));
-    };
-
-    const handleMouseUp = () => {
-      // Calculate selection rectangle bounds
-      const left = Math.min(selectionBox.startX, selectionBox.endX);
-      const right = Math.max(selectionBox.startX, selectionBox.endX);
-      const top = Math.min(selectionBox.startY, selectionBox.endY);
-      const bottom = Math.max(selectionBox.startY, selectionBox.endY);
-      
-      // Find all notes that intersect with selection rectangle
-      const selectedIds = itemIds.filter(id => {
+    const calculateIntersection = (left: number, right: number, top: number, bottom: number) => {
+      return itemIds.filter(id => {
         const item = items[id];
         if (!item) return false;
         
@@ -57,8 +40,28 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
         // Check for intersection
         return !(noteRight < left || noteLeft > right || noteBottom < top || noteTop > bottom);
       });
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const x = e.clientX - rect.left + (canvasRef.current?.parentElement?.scrollLeft || 0);
+      const y = e.clientY - rect.top + (canvasRef.current?.parentElement?.scrollTop || 0);
       
+      dispatch(updateSelectionBox({ x, y }));
+      
+      // Calculate selection in real-time
+      const left = Math.min(selectionBox.startX, x);
+      const right = Math.max(selectionBox.startX, x);
+      const top = Math.min(selectionBox.startY, y);
+      const bottom = Math.max(selectionBox.startY, y);
+      
+      const selectedIds = calculateIntersection(left, right, top, bottom);
       dispatch(selectMultipleItems(selectedIds));
+    };
+
+    const handleMouseUp = () => {
       dispatch(endSelectionBox());
     };
 
