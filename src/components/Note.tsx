@@ -1,23 +1,28 @@
 import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
-import { moveItem, updateItemContent } from '../store/workspaceSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { moveSelectedItems, updateItemContent, selectItem, toggleSelection } from '../store/workspaceSlice';
+import { RootState } from '../store';
 import type { Note as NoteType } from '../types';
 
-const NoteContainer = styled.div<{ $isDragging: boolean }>`
+const NoteContainer = styled.div<{ $isDragging: boolean; $isSelected: boolean }>`
   position: absolute;
   width: 200px;
   min-height: 150px;
   background: #fef68a;
-  border: 1px solid #e6d84e;
+  border: ${props => props.$isSelected ? '3px solid #4a90e2' : '1px solid #e6d84e'};
   border-radius: 4px;
   padding: 12px;
   cursor: ${props => props.$isDragging ? 'grabbing' : 'grab'};
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: ${props => props.$isSelected 
+    ? '0 4px 16px rgba(74, 144, 226, 0.3)' 
+    : '0 2px 8px rgba(0, 0, 0, 0.1)'};
   user-select: none;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: ${props => props.$isSelected 
+      ? '0 6px 20px rgba(74, 144, 226, 0.4)' 
+      : '0 4px 12px rgba(0, 0, 0, 0.15)'};
   }
 `;
 
@@ -39,8 +44,11 @@ interface NoteProps {
 
 export const Note = ({ note }: NoteProps) => {
   const dispatch = useDispatch();
+  const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
+  const isSelected = selectedIds.includes(note.id);
+  
   const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -49,24 +57,34 @@ export const Note = ({ note }: NoteProps) => {
     }
     
     e.preventDefault();
+    
+    // Handle selection
+    if (e.shiftKey) {
+      dispatch(toggleSelection(note.id));
+    } else if (!isSelected) {
+      dispatch(selectItem(note.id));
+    }
+    
+    // Start dragging
     setIsDragging(true);
-    setDragOffset({
-      x: e.clientX - note.position.x,
-      y: e.clientY - note.position.y,
-    });
+    setLastMousePos({ x: e.clientX, y: e.clientY });
   };
 
   useEffect(() => {
     if (!isDragging) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      dispatch(moveItem({
-        id: note.id,
-        position: {
-          x: e.clientX - dragOffset.x,
-          y: e.clientY - dragOffset.y,
-        },
-      }));
+      const delta = {
+        x: e.clientX - lastMousePos.x,
+        y: e.clientY - lastMousePos.y,
+      };
+      
+      if (isSelected) {
+        // Move all selected items
+        dispatch(moveSelectedItems({ delta }));
+      }
+      
+      setLastMousePos({ x: e.clientX, y: e.clientY });
     };
 
     const handleMouseUp = () => {
@@ -80,7 +98,7 @@ export const Note = ({ note }: NoteProps) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset, note.id, dispatch]);
+  }, [isDragging, lastMousePos, isSelected, dispatch]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     dispatch(updateItemContent({
@@ -93,6 +111,7 @@ export const Note = ({ note }: NoteProps) => {
     <NoteContainer
       ref={containerRef}
       $isDragging={isDragging}
+      $isSelected={isSelected}
       onMouseDown={handleMouseDown}
       style={{
         left: `${note.position.x}px`,

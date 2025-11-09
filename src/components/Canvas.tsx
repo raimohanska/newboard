@@ -1,6 +1,7 @@
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
+import { clearSelection } from '../store/workspaceSlice';
 import { Note } from './Note';
 
 const CanvasContainer = styled.div`
@@ -15,10 +16,17 @@ const CanvasContainer = styled.div`
 `;
 
 export const Canvas = () => {
+  const dispatch = useDispatch();
   const items = useSelector((state: RootState) => state.workspace.items);
 
+  const handleCanvasClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      dispatch(clearSelection());
+    }
+  };
+
   return (
-    <CanvasContainer>
+    <CanvasContainer onMouseDown={handleCanvasClick}>
       {Object.values(items).map(item => {
         if (item.type === 'Note') {
           return <Note key={item.id} note={item} />;
