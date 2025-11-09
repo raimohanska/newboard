@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { createItem, bulkCreateItems } from '../store/workspaceSlice';
 import { selectItemIds } from '../store/selectors';
+import { RootState } from '../store';
 import type { Note } from '../types';
 
 const SidebarContainer = styled.div`
@@ -92,6 +93,7 @@ const TestButton = styled.button`
 export const Sidebar = () => {
   const dispatch = useDispatch();
   const itemIds = useSelector(selectItemIds);
+  const zoom = useSelector((state: RootState) => state.workspace.zoom);
   const noteCount = itemIds.length;
   
   const [isDragging, setIsDragging] = useState(false);
@@ -150,8 +152,8 @@ export const Sidebar = () => {
             id: `note-${Date.now()}`,
             type: 'Note',
             position: {
-              x: e.clientX - rect.left + scrollWrapper.scrollLeft - dragOffset.x,
-              y: e.clientY - rect.top + scrollWrapper.scrollTop - dragOffset.y,
+              x: (e.clientX - rect.left + scrollWrapper.scrollLeft - dragOffset.x) / zoom,
+              y: (e.clientY - rect.top + scrollWrapper.scrollTop - dragOffset.y) / zoom,
             },
             content: '',
           };
@@ -167,7 +169,7 @@ export const Sidebar = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset, dispatch]);
+  }, [isDragging, dragOffset, zoom, dispatch]);
 
   return (
     <>

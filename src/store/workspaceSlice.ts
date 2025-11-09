@@ -11,6 +11,7 @@ interface WorkspaceState extends Workspace {
     endX: number;
     endY: number;
   };
+  zoom: number;
 }
 
 const loadedWorkspace = loadWorkspace();
@@ -25,6 +26,7 @@ const initialState: WorkspaceState = {
     endX: 0,
     endY: 0,
   },
+  zoom: 1,
 };
 
 const workspaceSlice = createSlice({
@@ -97,6 +99,9 @@ const workspaceSlice = createSlice({
     endSelectionBox: (state: WorkspaceState) => {
       state.selectionBox.isActive = false;
     },
+    setZoom: (state: WorkspaceState, action: PayloadAction<number>) => {
+      state.zoom = Math.max(0.1, Math.min(5, action.payload));
+    },
   },
 });
 
@@ -114,6 +119,7 @@ export const {
   startSelectionBox,
   updateSelectionBox,
   endSelectionBox,
+  setZoom,
 } = workspaceSlice.actions;
 export default workspaceSlice.reducer;
 

@@ -47,6 +47,7 @@ export const Note = ({ noteId }: NoteProps) => {
   const dispatch = useDispatch();
   const note = useSelector((state: RootState) => state.workspace.items[noteId] as NoteType);
   const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
+  const zoom = useSelector((state: RootState) => state.workspace.zoom);
   const isSelected = selectedIds.includes(noteId);
   
   if (!note) return null;
@@ -79,8 +80,8 @@ export const Note = ({ noteId }: NoteProps) => {
 
     const handleMouseMove = (e: MouseEvent) => {
       const delta = {
-        x: e.clientX - lastMousePosRef.current.x,
-        y: e.clientY - lastMousePosRef.current.y,
+        x: (e.clientX - lastMousePosRef.current.x) / zoom,
+        y: (e.clientY - lastMousePosRef.current.y) / zoom,
       };
       
       if (isSelected) {
@@ -102,7 +103,7 @@ export const Note = ({ noteId }: NoteProps) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, isSelected, dispatch]);
+  }, [isDragging, isSelected, zoom, dispatch]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     dispatch(updateItemContent({

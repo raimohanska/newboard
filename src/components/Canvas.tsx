@@ -18,7 +18,11 @@ const CanvasContainer = styled.div`
   background-color: #ffffff;
 `;
 
-export const Canvas = () => {
+interface CanvasProps {
+  zoom: number;
+}
+
+export const Canvas = ({ zoom }: CanvasProps) => {
   increaseRenderCount('Canvas');
   const dispatch = useDispatch();
   const itemIds = useSelector(selectItemIds);
@@ -35,11 +39,12 @@ export const Canvas = () => {
     if (isModifierPressed) {
       // Start rectangular selection
       e.preventDefault();
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      const scrollWrapper = canvasRef.current?.parentElement?.parentElement;
+      if (!scrollWrapper) return;
       
-      const x = e.clientX - rect.left + (canvasRef.current?.parentElement?.scrollLeft || 0);
-      const y = e.clientY - rect.top + (canvasRef.current?.parentElement?.scrollTop || 0);
+      const wrapperRect = scrollWrapper.getBoundingClientRect();
+      const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
+      const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
       
       dispatch(startSelectionBox({ x, y }));
     } else {

@@ -23,6 +23,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
   const isSelecting = selectionBox.isActive;
   const itemIds = useSelector(selectItemIds);
   const items = useSelector((state: RootState) => state.workspace.items);
+  const zoom = useSelector((state: RootState) => state.workspace.zoom);
   
   useEffect(() => {
     if (!isSelecting) return;
@@ -43,11 +44,12 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      const scrollWrapper = canvasRef.current?.parentElement?.parentElement;
+      if (!scrollWrapper) return;
 
-      const x = e.clientX - rect.left + (canvasRef.current?.parentElement?.scrollLeft || 0);
-      const y = e.clientY - rect.top + (canvasRef.current?.parentElement?.scrollTop || 0);
+      const wrapperRect = scrollWrapper.getBoundingClientRect();
+      const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
+      const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
       
       dispatch(updateSelectionBox({ x, y }));
       
@@ -72,7 +74,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isSelecting, selectionBox, itemIds, items, dispatch, canvasRef]);
+  }, [isSelecting, selectionBox, itemIds, items, zoom, dispatch, canvasRef]);
 
   if (!selectionBox.isActive) return null;
 
