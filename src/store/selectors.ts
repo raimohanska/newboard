@@ -15,3 +15,14 @@ export const selectItemIds = createSelector(
   }
 );
 
+// Memoized selector factory for individual items
+export const selectItemById = (itemId: string) => createSelector(
+  [selectItems],
+  (items) => items[itemId],
+  {
+    memoizeOptions: {
+      resultEqualityCheck: equal
+    }
+  }
+);
+

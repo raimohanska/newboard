@@ -1,3 +1,8 @@
+## Status
+
+- Zoom surprizingly sluggish and content-visibility et al do not seem to help
+- Dragging around still sluggish. What up?
+
 ## Performance optimizations
 
 1. Make sure your root component is not re-rendered unnecessarily. In this case, Canvas must not re-render when a Note is moved. For this, it must only use the list of item ids from the store.
@@ -5,6 +10,7 @@
 3. If you need some state in event handlers, consider taking the state directly from your state store in the handler, instead of using `useSelector`. Otherwise your component will render whenever this state changes, even though you only need the data in an event handler.
 4. Consider mutable state store. If your state is large, it will be expensive to clone it on every change. Using, for instance, an Y.js document may prove more performant, as there's no cloning.
 5. Consider CSS `content-visibility: auto`, which might speed things up given that painting is a bottleneck
+6. Minimize the components that are rendered. For instance, if only position is changed, use a separate memoized inner components for the content that doesn't need re-rendering.
 
 ## Performance measurements
 
