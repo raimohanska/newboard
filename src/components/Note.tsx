@@ -48,7 +48,7 @@ export const Note = ({ note }: NoteProps) => {
   const isSelected = selectedIds.includes(note.id);
   
   const [isDragging, setIsDragging] = useState(false);
-  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+  const lastMousePosRef = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -67,7 +67,7 @@ export const Note = ({ note }: NoteProps) => {
     
     // Start dragging
     setIsDragging(true);
-    setLastMousePos({ x: e.clientX, y: e.clientY });
+    lastMousePosRef.current = { x: e.clientX, y: e.clientY };
   };
 
   useEffect(() => {
@@ -75,8 +75,8 @@ export const Note = ({ note }: NoteProps) => {
 
     const handleMouseMove = (e: MouseEvent) => {
       const delta = {
-        x: e.clientX - lastMousePos.x,
-        y: e.clientY - lastMousePos.y,
+        x: e.clientX - lastMousePosRef.current.x,
+        y: e.clientY - lastMousePosRef.current.y,
       };
       
       if (isSelected) {
@@ -84,7 +84,7 @@ export const Note = ({ note }: NoteProps) => {
         dispatch(moveSelectedItems({ delta }));
       }
       
-      setLastMousePos({ x: e.clientX, y: e.clientY });
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
     };
 
     const handleMouseUp = () => {
@@ -98,7 +98,7 @@ export const Note = ({ note }: NoteProps) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, lastMousePos, isSelected, dispatch]);
+  }, [isDragging, isSelected, dispatch]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     dispatch(updateItemContent({
