@@ -11,8 +11,8 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
-const ZoomContainer = styled.div<{ $zoom: number }>`
-  transform: scale(${props => props.$zoom});
+const ZoomContainer = styled.div`
+  transform: scale(var(--zoom));
   transform-origin: 0 0;
 `;
 
@@ -66,7 +66,7 @@ export const ScrollWrapper = () => {
 
   return (
     <Wrapper ref={wrapperRef} data-scroll-wrapper>
-      <ZoomContainer $zoom={zoom}>
+      <ZoomContainer style={{ '--zoom': zoom } as React.CSSProperties}>
         <Canvas />
       </ZoomContainer>
     </Wrapper>
