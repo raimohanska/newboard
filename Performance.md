@@ -1,7 +1,12 @@
 ## Status
 
+- Rect selection is super slow with 10000 notes. Not investigated.
 - Zoom surprizingly sluggish and content-visibility et al do not seem to help
 - Dragging around still sluggish. What up?
+
+## To try
+
+- Convert to Y.js, see effect
 
 ## Performance optimizations
 

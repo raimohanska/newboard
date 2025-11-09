@@ -31,7 +31,6 @@ interface NoteContentProps {
 }
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
-  console.log("RENDER NOTE CONTENT", noteId)
   const dispatch = useDispatch();
   const selectNote = useMemo(() => selectItemById(noteId), [noteId]);
   const note = useSelector(selectNote) as NoteType;
