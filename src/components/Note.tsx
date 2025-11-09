@@ -39,14 +39,17 @@ const TextArea = styled.textarea`
 `;
 
 interface NoteProps {
-  note: NoteType;
+  noteId: string;
 }
 
-export const Note = ({ note }: NoteProps) => {
-  console.log("Render Note");
+export const Note = ({ noteId }: NoteProps) => {
+  //increaseRenderCount('Note');
   const dispatch = useDispatch();
+  const note = useSelector((state: RootState) => state.workspace.items[noteId] as NoteType);
   const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
-  const isSelected = selectedIds.includes(note.id);
+  const isSelected = selectedIds.includes(noteId);
+  
+  if (!note) return null;
   
   const [isDragging, setIsDragging] = useState(false);
   const lastMousePosRef = useRef({ x: 0, y: 0 });

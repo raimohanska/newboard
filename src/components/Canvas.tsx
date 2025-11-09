@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
 import { clearSelection } from '../store/workspaceSlice';
+import { selectItemIds } from '../store/selectors';
 import { Note } from './Note';
+import { increaseRenderCount } from '../utils/renderCounts';
 
 const CanvasContainer = styled.div`
   position: relative;
@@ -16,8 +17,9 @@ const CanvasContainer = styled.div`
 `;
 
 export const Canvas = () => {
+  increaseRenderCount('Canvas');
   const dispatch = useDispatch();
-  const items = useSelector((state: RootState) => state.workspace.items);
+  const itemIds = useSelector(selectItemIds);
 
   const handleCanvasClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -27,12 +29,9 @@ export const Canvas = () => {
 
   return (
     <CanvasContainer onMouseDown={handleCanvasClick}>
-      {Object.values(items).map(item => {
-        if (item.type === 'Note') {
-          return <Note key={item.id} note={item} />;
-        }
-        return null;
-      })}
+      {itemIds.map(id => (
+        <Note key={id} noteId={id} />
+      ))}
     </CanvasContainer>
   );
 };
