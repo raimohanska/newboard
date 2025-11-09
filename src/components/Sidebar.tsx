@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
-import { createItem } from '../store/workspaceSlice';
+import { createItem, bulkCreateItems } from '../store/workspaceSlice';
 import type { Note } from '../types';
 
 const SidebarContainer = styled.div`
@@ -57,11 +57,47 @@ const DraggingPreview = styled.div`
   z-index: 1000;
 `;
 
+const TestButton = styled.button`
+  margin-top: 30px;
+  padding: 10px 16px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+
+  &:hover {
+    background: #357abd;
+  }
+
+  &:active {
+    background: #2868a8;
+  }
+`;
+
 export const Sidebar = () => {
   const dispatch = useDispatch();
   const [isDragging, setIsDragging] = useState(false);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+  const handleAddTestItems = () => {
+    const items: Note[] = [];
+    for (let i = 0; i < 1000; i++) {
+      items.push({
+        id: `test-note-${Date.now()}-${i}`,
+        type: 'Note',
+        position: {
+          x: Math.random() * 9800,
+          y: Math.random() * 9800,
+        },
+        content: `Test note ${i + 1}`,
+      });
+    }
+    dispatch(bulkCreateItems(items));
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -128,6 +164,9 @@ export const Sidebar = () => {
         >
           Note
         </DraggableNote>
+        <TestButton onClick={handleAddTestItems}>
+          Add 1000 Notes
+        </TestButton>
       </SidebarContainer>
       {isDragging && (
         <DraggingPreview

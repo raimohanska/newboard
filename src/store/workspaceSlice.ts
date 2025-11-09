@@ -61,6 +61,11 @@ const workspaceSlice = createSlice({
     clearSelection: (state: WorkspaceState) => {
       state.selectedIds = [];
     },
+    bulkCreateItems: (state: WorkspaceState, action: PayloadAction<CanvasItem[]>) => {
+      action.payload.forEach(item => {
+        state.items[item.id] = item;
+      });
+    },
   },
 });
 
@@ -73,6 +78,7 @@ export const {
   selectItem,
   toggleSelection,
   clearSelection,
+  bulkCreateItems,
 } = workspaceSlice.actions;
 export default workspaceSlice.reducer;
 
