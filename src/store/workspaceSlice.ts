@@ -12,6 +12,10 @@ interface WorkspaceState extends Workspace {
     endY: number;
   };
   zoom: number;
+  dragOffset: {
+    x: number;
+    y: number;
+  } | null;
 }
 
 const loadedWorkspace = loadWorkspace();
@@ -27,6 +31,7 @@ const initialState: WorkspaceState = {
     endY: 0,
   },
   zoom: 1,
+  dragOffset: null,
 };
 
 const workspaceSlice = createSlice({
@@ -44,13 +49,23 @@ const workspaceSlice = createSlice({
     },
     moveSelectedItems: (state: WorkspaceState, action: PayloadAction<{ delta: { x: number; y: number } }>) => {
       const { delta } = action.payload;
-      state.selectedIds.forEach(id => {
-        const item = state.items[id];
-        if (item) {
-          item.position.x += delta.x;
-          item.position.y += delta.y;
-        }
-      });
+      if (!state.dragOffset) {
+        state.dragOffset = { x: 0, y: 0 };
+      }
+      state.dragOffset.x += delta.x;
+      state.dragOffset.y += delta.y;
+    },
+    commitDrag: (state: WorkspaceState) => {
+      if (state.dragOffset) {
+        state.selectedIds.forEach(id => {
+          const item = state.items[id];
+          if (item) {
+            item.position.x += state.dragOffset!.x;
+            item.position.y += state.dragOffset!.y;
+          }
+        });
+        state.dragOffset = null;
+      }
     },
     updateItemContent: (state: WorkspaceState, action: PayloadAction<{ id: string; content: string }>) => {
       const item = state.items[action.payload.id];
@@ -109,6 +124,7 @@ export const {
   createItem, 
   moveItem, 
   moveSelectedItems,
+  commitDrag,
   updateItemContent, 
   deleteItem,
   selectItem,

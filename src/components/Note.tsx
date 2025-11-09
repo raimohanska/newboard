@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import { moveSelectedItems, updateItemContent, selectItem, toggleSelection } from '../store/workspaceSlice';
+import { moveSelectedItems, commitDrag, updateItemContent, selectItem, toggleSelection } from '../store/workspaceSlice';
 import { RootState } from '../store';
 import type { Note as NoteType } from '../types';
 import { increaseRenderCount } from '../utils/renderCounts';
@@ -44,14 +44,20 @@ interface NoteProps {
 }
 
 export const Note = ({ noteId }: NoteProps) => {
-  increaseRenderCount('Note');
+  //increaseRenderCount('Note');
   const dispatch = useDispatch();
   const store = useStore<RootState>();
   const note = useSelector((state: RootState) => state.workspace.items[noteId] as NoteType);
   const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
+  const dragOffset = useSelector((state: RootState) => state.workspace.dragOffset);
   const isSelected = selectedIds.includes(noteId);
   
   if (!note) return null;
+  
+  // Apply drag offset to selected notes
+  const displayPosition = isSelected && dragOffset
+    ? { x: note.position.x + dragOffset.x, y: note.position.y + dragOffset.y }
+    : note.position;
   
   const [isDragging, setIsDragging] = useState(false);
   const lastMousePosRef = useRef({ x: 0, y: 0 });
@@ -98,6 +104,7 @@ export const Note = ({ noteId }: NoteProps) => {
 
     const handleMouseUp = () => {
       setIsDragging(false);
+      dispatch(commitDrag());
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -123,8 +130,8 @@ export const Note = ({ noteId }: NoteProps) => {
       $isSelected={isSelected}
       onMouseDown={handleMouseDown}
       style={{
-        left: `${note.position.x}px`,
-        top: `${note.position.y}px`,
+        left: `${displayPosition.x}px`,
+        top: `${displayPosition.y}px`,
       }}
     >
       <TextArea
