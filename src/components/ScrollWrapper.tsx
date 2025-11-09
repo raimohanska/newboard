@@ -46,7 +46,7 @@ export const ScrollWrapper = () => {
 
       // Calculate zoom delta
       const delta = e.deltaY * -0.01;
-      const newZoom = Math.max(0.1, Math.min(5, zoom + delta * zoom * 0.1));
+      const newZoom = Math.max(0.1, Math.min(5, zoom + delta * zoom * 0.5));
 
       dispatch(setZoom(newZoom));
 
