@@ -67,7 +67,7 @@ export const ScrollWrapper = () => {
   return (
     <Wrapper ref={wrapperRef} data-scroll-wrapper>
       <ZoomContainer $zoom={zoom}>
-        <Canvas zoom={zoom} />
+        <Canvas />
       </ZoomContainer>
     </Wrapper>
   );

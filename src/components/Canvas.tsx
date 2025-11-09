@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import { useRef, memo } from 'react';
 import styled from 'styled-components';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, useStore } from 'react-redux';
 import { clearSelection, startSelectionBox } from '../store/workspaceSlice';
 import { selectItemIds } from '../store/selectors';
+import { RootState } from '../store';
 import { Note } from './Note';
 import { RectangularSelection } from './RectangularSelection';
 import { increaseRenderCount } from '../utils/renderCounts';
@@ -18,48 +19,49 @@ const CanvasContainer = styled.div`
   background-color: #ffffff;
 `;
 
-interface CanvasProps {
-  zoom: number;
-}
 
-export const Canvas = ({ zoom }: CanvasProps) => {
-  increaseRenderCount('Canvas');
-  const dispatch = useDispatch();
-  const itemIds = useSelector(selectItemIds);
-  
-  const canvasRef = useRef<HTMLDivElement>(null);
+export const Canvas = memo((() => {
+    increaseRenderCount('Canvas');
+    const dispatch = useDispatch();
+    const store = useStore<RootState>();
+    const itemIds = useSelector(selectItemIds);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    // Check if clicking on canvas (not on a note)
-    if (e.target !== e.currentTarget) return;
-    
-    // Check for modifier keys (Ctrl, Cmd, or Alt)
-    const isModifierPressed = e.ctrlKey || e.metaKey || e.altKey;
-    
-    if (isModifierPressed) {
-      // Start rectangular selection
-      e.preventDefault();
-      const scrollWrapper = canvasRef.current?.parentElement?.parentElement;
-      if (!scrollWrapper) return;
-      
-      const wrapperRect = scrollWrapper.getBoundingClientRect();
-      const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
-      const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
-      
-      dispatch(startSelectionBox({ x, y }));
-    } else {
-      // Clear selection on regular click
-      dispatch(clearSelection());
-    }
-  };
+    const canvasRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <CanvasContainer ref={canvasRef} onMouseDown={handleMouseDown}>
-      {itemIds.map(id => (
-        <Note key={id} noteId={id} />
-      ))}
-      <RectangularSelection canvasRef={canvasRef} />
-    </CanvasContainer>
-  );
-};
+    const handleMouseDown = (e: React.MouseEvent) => {
+      // Check if clicking on canvas (not on a note)
+      if (e.target !== e.currentTarget) return;
+
+      // Check for modifier keys (Ctrl, Cmd, or Alt)
+      const isModifierPressed = e.ctrlKey || e.metaKey || e.altKey;
+
+      if (isModifierPressed) {
+        // Start rectangular selection
+        e.preventDefault();
+        const scrollWrapper = canvasRef.current?.parentElement?.parentElement;
+        if (!scrollWrapper) return;
+
+        // Get zoom from store at interaction time (not reactive)
+        const zoom = store.getState().workspace.zoom;
+
+        const wrapperRect = scrollWrapper.getBoundingClientRect();
+        const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
+        const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
+
+        dispatch(startSelectionBox({ x, y }));
+      } else {
+        // Clear selection on regular click
+        dispatch(clearSelection());
+      }
+    };
+
+    return (
+      <CanvasContainer ref={canvasRef} onMouseDown={handleMouseDown}>
+        {itemIds.map(id => (
+          <Note key={id} noteId={id} />
+        ))}
+        <RectangularSelection canvasRef={canvasRef} />
+      </CanvasContainer>
+    );
+  }));
 
