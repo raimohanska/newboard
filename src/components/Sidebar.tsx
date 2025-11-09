@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { createItem, bulkCreateItems } from '../store/workspaceSlice';
+import { selectItemIds } from '../store/selectors';
 import type { Note } from '../types';
 
 const SidebarContainer = styled.div`
@@ -16,6 +17,17 @@ const Title = styled.h2`
   font-size: 18px;
   margin-bottom: 20px;
   color: #333;
+`;
+
+const Counter = styled.div`
+  margin-bottom: 20px;
+  padding: 10px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
 `;
 
 const DraggableNote = styled.div<{ $isDragging: boolean }>`
@@ -79,6 +91,9 @@ const TestButton = styled.button`
 
 export const Sidebar = () => {
   const dispatch = useDispatch();
+  const itemIds = useSelector(selectItemIds);
+  const noteCount = itemIds.length;
+  
   const [isDragging, setIsDragging] = useState(false);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -158,6 +173,9 @@ export const Sidebar = () => {
     <>
       <SidebarContainer>
         <Title>Elements</Title>
+        <Counter>
+          {noteCount} {noteCount === 1 ? 'note' : 'notes'}
+        </Counter>
         <DraggableNote
           $isDragging={isDragging}
           onMouseDown={handleMouseDown}
