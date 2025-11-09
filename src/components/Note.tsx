@@ -29,7 +29,7 @@ const NoteContainer = styled.div<{ $isDragging: boolean; $isSelected: boolean }>
 
 const TextArea = styled.textarea`
   width: 100%;
-  min-height: 120px;
+  min-height: 30px;
   background: transparent;
   border: none;
   outline: none;
