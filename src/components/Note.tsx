@@ -43,6 +43,7 @@ interface NoteProps {
 }
 
 export const Note = ({ note }: NoteProps) => {
+  console.log("Render Note");
   const dispatch = useDispatch();
   const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
   const isSelected = selectedIds.includes(note.id);
