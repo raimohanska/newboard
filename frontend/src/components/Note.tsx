@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useItem } from '../hooks/useItemStore';
 import { useYText } from '../hooks/useYText';
 import { QuillEditor } from './QuillEditor';
-import { useIsOthersEditing } from '../hooks/useIsOthersEditing';
+import { useIsSelectedByOthers } from '../hooks/useIsSelectedByOthers';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
 
@@ -60,17 +60,19 @@ const PlainTextView = memo(({ yText }: PlainTextViewProps) => {
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
   const note = useItem(noteId) as NoteType;
-  const isOthersEditing = useIsOthersEditing(noteId);
+  const othersSelection = useIsSelectedByOthers(noteId);
   
   if (!note) return null;
 
   // Show QuillEditor if locally selected OR if another user is editing
-  const showEditor = isSelected || isOthersEditing;
+  const showEditor = isSelected || othersSelection.isSelected;
 
   return (
     <NoteContainer
       $isDragging={isDragging}
       $isSelected={isSelected}
+      $isSelectedByOthers={othersSelection.isSelected}
+      $othersColor={othersSelection.color}
     >
       {showEditor ? (
         <QuillEditor yText={note.content} />
@@ -81,11 +83,20 @@ const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) 
   );
 });
 
-const NoteContainer = styled.div<{ $isDragging: boolean; $isSelected: boolean }>`
+const NoteContainer = styled.div<{ 
+  $isDragging: boolean; 
+  $isSelected: boolean; 
+  $isSelectedByOthers: boolean;
+  $othersColor: string | null;
+}>`
   width: 100%;
   height: 150px;
   background: #fef68a;
-  border: ${props => props.$isSelected ? '3px solid #4a90e2' : '1px solid #e6d84e'};
+  border: ${props => {
+    if (props.$isSelected) return '3px solid #4a90e2';
+    if (props.$isSelectedByOthers && props.$othersColor) return `3px solid ${props.$othersColor}`;
+    return '1px solid #e6d84e';
+  }};
   border-radius: 4px;
   padding: 12px;
   cursor: ${props => props.$isDragging ? 'grabbing' : 'grab'};
@@ -93,6 +104,8 @@ const NoteContainer = styled.div<{ $isDragging: boolean; $isSelected: boolean }>
     ? '0 4px 16px rgba(74, 144, 226, 0.3)' 
     : '0 2px 8px rgba(0, 0, 0, 0.1)'};
   user-select: none;
+  filter: ${props => props.$isSelectedByOthers && !props.$isSelected ? 'opacity(0.6)' : 'none'};
+  transition: filter 0.2s ease, border 0.2s ease;
 
   &:hover {
     box-shadow: ${props => props.$isSelected 

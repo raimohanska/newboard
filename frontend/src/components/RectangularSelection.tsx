@@ -5,15 +5,33 @@ import { useItemIds } from '../hooks/useItemStore';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useUpdateSelection } from '../hooks/useSelection';
 import { useSelectionBox, useUpdateSelectionBox } from '../hooks/useSelectionBox';
+import { useAllSelectionBoxes } from '../hooks/useAllSelectionBoxes';
 import { RootState } from '../store';
 
-const SelectionBox = styled.div`
+const SelectionBox = styled.div<{ $color: string; $isLocal: boolean }>`
   position: absolute;
-  border: 2px solid #4a90e2;
-  background: rgba(74, 144, 226, 0.1);
+  border: 2px solid ${props => {
+    const rgb = hexToRgb(props.$color);
+    const opacity = props.$isLocal ? 1 : 0.5;
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+  }};
+  background: ${props => {
+    const rgb = hexToRgb(props.$color);
+    const opacity = props.$isLocal ? 0.1 : 0.05;
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+  }};
   pointer-events: none;
   z-index: 1000;
 `;
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 74, g: 144, b: 226 };
+}
 
 interface RectangularSelectionProps {
   canvasRef: React.RefObject<HTMLDivElement>;
@@ -24,6 +42,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
   const { selectMultipleItems } = useUpdateSelection();
   const { updateSelectionBox, endSelectionBox } = useUpdateSelectionBox();
   const selectionBox = useSelectionBox();
+  const allBoxes = useAllSelectionBoxes();
   const isSelecting = selectionBox.isActive;
   const itemIds = useItemIds();
   const zoom = useSelector((state: RootState) => state.workspace.zoom);
@@ -79,15 +98,26 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
     };
   }, [isSelecting, selectionBox, itemIds, zoom, canvasRef, updateSelectionBox, endSelectionBox, selectMultipleItems, itemStore]);
 
-  if (!selectionBox.isActive) return null;
+  return (
+    <>
+      {allBoxes.map(({ clientId, isLocal, color, selectionBox: box }) => {
+        const style = {
+          left: `${Math.min(box.startX, box.endX)}px`,
+          top: `${Math.min(box.startY, box.endY)}px`,
+          width: `${Math.abs(box.endX - box.startX)}px`,
+          height: `${Math.abs(box.endY - box.startY)}px`,
+        };
 
-  const style = {
-    left: `${Math.min(selectionBox.startX, selectionBox.endX)}px`,
-    top: `${Math.min(selectionBox.startY, selectionBox.endY)}px`,
-    width: `${Math.abs(selectionBox.endX - selectionBox.startX)}px`,
-    height: `${Math.abs(selectionBox.endY - selectionBox.startY)}px`,
-  };
-
-  return <SelectionBox style={style} />;
+        return (
+          <SelectionBox 
+            key={clientId} 
+            style={style} 
+            $color={color}
+            $isLocal={isLocal}
+          />
+        );
+      })}
+    </>
+  );
 };
 
