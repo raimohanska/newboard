@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectMultipleItems, updateSelectionBox, endSelectionBox } from '../store/workspaceSlice';
-import { useYjsItemIds } from '../hooks/useYjsItems';
-import { yItems, yMapToItem } from '../store/yjs';
+import { useItemIds } from '../hooks/useItemStore';
+import { itemStore } from '../store/ItemStore';
 import { RootState } from '../store';
 
 const SelectionBox = styled.div`
@@ -22,7 +22,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
   const dispatch = useDispatch();
   const selectionBox = useSelector((state: RootState) => state.workspace.selectionBox);
   const isSelecting = selectionBox.isActive;
-  const itemIds = useYjsItemIds();
+  const itemIds = useItemIds();
   const zoom = useSelector((state: RootState) => state.workspace.zoom);
   
   useEffect(() => {
@@ -30,10 +30,9 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
 
     const calculateIntersection = (left: number, right: number, top: number, bottom: number) => {
       return itemIds.filter(id => {
-        const ymap = yItems.get(id);
-        if (!ymap) return false;
+        const item = itemStore.getItem(id);
+        if (!item) return false;
         
-        const item = yMapToItem(ymap);
         const noteLeft = item.position.x;
         const noteTop = item.position.y;
         const noteRight = noteLeft + 200; // Note width

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { createItem, bulkCreateItems } from '../store/itemOperations';
-import { useYjsItemIds } from '../hooks/useYjsItems';
+import { itemStore } from '../store/ItemStore';
+import { useItemIds } from '../hooks/useItemStore';
 import { RootState } from '../store';
 import type { Note } from '../types';
 
@@ -92,7 +92,7 @@ const TestButton = styled.button`
 
 export const Sidebar = () => {
   const dispatch = useDispatch();
-  const itemIds = useYjsItemIds();
+  const itemIds = useItemIds();
   const zoom = useSelector((state: RootState) => state.workspace.zoom);
   const noteCount = itemIds.length;
   
@@ -113,7 +113,7 @@ export const Sidebar = () => {
         content: `Test note ${i + 1}`,
       });
     }
-    bulkCreateItems(items);
+    itemStore.bulkCreateItems(items);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -157,7 +157,7 @@ export const Sidebar = () => {
             },
             content: '',
           };
-          createItem(newNote);
+          itemStore.createItem(newNote);
         }
       }
     };

@@ -2,8 +2,8 @@ import { useState, useRef, useEffect, ReactNode } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { moveSelectedItems, selectItem, toggleSelection } from '../store/workspaceSlice';
-import { commitItemPositions } from '../store/itemOperations';
-import { useYjsItem } from '../hooks/useYjsItems';
+import { itemStore } from '../store/ItemStore';
+import { useItem } from '../hooks/useItemStore';
 import { RootState } from '../store';
 
 const ItemPositionerContainer = styled.div`
@@ -25,7 +25,7 @@ interface ItemPositionerProps {
 export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
   const dispatch = useDispatch();
   const store = useStore<RootState>();
-  const item = useYjsItem(itemId);
+  const item = useItem(itemId);
   const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
   const isSelected = selectedIds.includes(itemId);
   
@@ -86,7 +86,17 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
 
     const handleMouseUp = () => {
       setIsDragging(false);
-      commitItemPositions();
+      
+      // Commit positions to Y.js
+      const dragOffset = store.getState().workspace.dragOffset;
+      if (dragOffset) {
+        itemStore.updateItemPositions(
+          store.getState().workspace.selectedIds,
+          dragOffset.x,
+          dragOffset.y
+        );
+      }
+      
       dispatch({ type: 'workspace/commitDrag' });
     };
 

@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import styled from 'styled-components';
-import { updateItemContent } from '../store/itemOperations';
-import { useYjsItem } from '../hooks/useYjsItems';
+import { itemStore } from '../store/ItemStore';
+import { useItem } from '../hooks/useItemStore';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
 
@@ -30,12 +30,12 @@ interface NoteContentProps {
 }
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
-  const note = useYjsItem(noteId) as NoteType;
+  const note = useItem(noteId) as NoteType;
   
   if (!note) return null;
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updateItemContent(noteId, e.target.value);
+    itemStore.updateItemContent(noteId, e.target.value);
   };
 
   return (
