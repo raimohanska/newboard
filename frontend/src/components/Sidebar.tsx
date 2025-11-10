@@ -3,13 +3,16 @@ import * as Y from 'yjs';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useItemIds } from '../hooks/useItemStore';
 import { RootState } from '../store';
 import type { Note } from '../types';
 
 export const Sidebar = () => {
   const dispatch = useDispatch();
   const { itemStore } = useWorkspace();
+  const itemIds = useItemIds();
   const zoom = useSelector((state: RootState) => state.workspace.zoom);
+  const noteCount = itemIds.length;
   
   const [isDragging, setIsDragging] = useState(false);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
@@ -93,6 +96,7 @@ export const Sidebar = () => {
     <>
       <SidebarContainer>
         <Title>Toolbar</Title>
+        <NoteCount>{noteCount} notes</NoteCount>
         <DraggableNote
           $isDragging={isDragging}
           onMouseDown={handleMouseDown}
@@ -138,6 +142,11 @@ const SidebarContainer = styled.div`
 const Title = styled.h2`
   font-size: 18px;
   color: #333;
+`;
+
+const NoteCount = styled.div`
+  font-size: 14px;
+  color: #666;
 `;
 
 const DraggableNote = styled.div<{ $isDragging: boolean }>`
