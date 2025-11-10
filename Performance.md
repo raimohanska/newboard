@@ -16,6 +16,7 @@
 4. Consider mutable state store. If your state is large, it will be expensive to clone it on every change. Using, for instance, an Y.js document may prove more performant, as there's no cloning.
 5. Consider CSS `content-visibility: auto`, which might speed things up given that painting is a bottleneck
 6. Minimize the components that are rendered. For instance, if only position is changed, use a separate memoized inner components for the content that doesn't need re-rendering.
+7. Initialize expensive stuff only if your component is actually in viewport. Create an `useIsInViewPort` hook.
 
 ## Performance measurements
 

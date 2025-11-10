@@ -3,6 +3,7 @@ import Quill from 'quill';
 import { QuillBinding } from 'y-quill';
 import * as Y from 'yjs';
 import styled from 'styled-components';
+import { useIsInViewport } from '../hooks/useIsInViewport';
 import 'quill/dist/quill.snow.css';
 
 const EditorContainer = styled.div`
@@ -41,9 +42,11 @@ export const QuillEditor = ({ yText }: QuillEditorProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
   const bindingRef = useRef<QuillBinding | null>(null);
+  const isInViewport = useIsInViewport(containerRef);
 
+  // Initialize Quill only when in viewport
   useEffect(() => {
-    if (!containerRef.current || quillRef.current) return;
+    if (!containerRef.current || !isInViewport || quillRef.current) return;
 
     // Initialize Quill
     const quill = new Quill(containerRef.current, {
@@ -64,7 +67,7 @@ export const QuillEditor = ({ yText }: QuillEditorProps) => {
       bindingRef.current = null;
       quillRef.current = null;
     };
-  }, [yText]);
+  }, [yText, isInViewport]);
 
   return <EditorContainer ref={containerRef} />;
 };
