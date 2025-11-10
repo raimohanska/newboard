@@ -4,6 +4,7 @@ import { useDispatch, useSelector, useStore } from 'react-redux';
 import { moveSelectedItems, selectItem, toggleSelection } from '../store/workspaceSlice';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useItem } from '../hooks/useItemStore';
+import { useOthersDragOffset } from '../hooks/useOthersDragOffset';
 import { RootState } from '../store';
 
 const ItemPositionerContainer = styled.div`
@@ -31,9 +32,12 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
   const isSelected = selectedIds.includes(itemId);
   
   // Only observe dragOffset if this item is selected
-  const dragOffset = useSelector(
+  const localDragOffset = useSelector(
     (state: RootState) => isSelected ? state.workspace.dragOffset : null
   );
+  
+  // Get other users' drag offset for this item
+  const othersDragOffset = useOthersDragOffset(itemId);
   
   if (!item) return null;
   
@@ -41,7 +45,8 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
   const lastMousePosRef = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Apply drag offset to selected items
+  // Apply drag offset (local has priority over others)
+  const dragOffset = localDragOffset || othersDragOffset;
   const displayPosition = dragOffset
     ? { x: item.position.x + dragOffset.x, y: item.position.y + dragOffset.y }
     : item.position;
