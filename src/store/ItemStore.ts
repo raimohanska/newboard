@@ -28,10 +28,6 @@ class ItemStore {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    
-    // Clean up old storage
-    localStorage.removeItem('newboard-yjs');
-    localStorage.removeItem('newboard-workspace');
   }
 
   private setupPersistence() {
