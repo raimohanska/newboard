@@ -1,9 +1,9 @@
 import { useRef, memo } from 'react';
 import styled from 'styled-components';
-import { useDispatch, useStore } from 'react-redux';
-import { startSelectionBox } from '../store/workspaceSlice';
+import { useStore } from 'react-redux';
 import { useItemIds } from '../hooks/useItemStore';
 import { useUpdateSelection } from '../hooks/useSelection';
+import { useUpdateSelectionBox } from '../hooks/useSelectionBox';
 import { RootState } from '../store';
 import { Note } from './Note';
 import { RectangularSelection } from './RectangularSelection';
@@ -25,11 +25,11 @@ const CanvasContainer = styled.div`
 
 export const Canvas = memo((() => {
     increaseRenderCount('Canvas');
-    const dispatch = useDispatch();
     const store = useStore<RootState>();
     const itemIds = useItemIds();
     const updateCursor = useUpdateCursor();
     const { clearSelection } = useUpdateSelection();
+    const { startSelectionBox } = useUpdateSelectionBox();
 
     const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -68,7 +68,7 @@ export const Canvas = memo((() => {
       const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
       const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
 
-      dispatch(startSelectionBox({ x, y }));
+      startSelectionBox(x, y);
     };
 
     return (

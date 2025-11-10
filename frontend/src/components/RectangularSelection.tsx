@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import styled from 'styled-components';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateSelectionBox, endSelectionBox } from '../store/workspaceSlice';
+import { useSelector } from 'react-redux';
 import { useItemIds } from '../hooks/useItemStore';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useUpdateSelection } from '../hooks/useSelection';
+import { useSelectionBox, useUpdateSelectionBox } from '../hooks/useSelectionBox';
 import { RootState } from '../store';
 
 const SelectionBox = styled.div`
@@ -20,10 +20,10 @@ interface RectangularSelectionProps {
 }
 
 export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) => {
-  const dispatch = useDispatch();
   const { itemStore } = useWorkspace();
   const { selectMultipleItems } = useUpdateSelection();
-  const selectionBox = useSelector((state: RootState) => state.workspace.selectionBox);
+  const { updateSelectionBox, endSelectionBox } = useUpdateSelectionBox();
+  const selectionBox = useSelectionBox();
   const isSelecting = selectionBox.isActive;
   const itemIds = useItemIds();
   const zoom = useSelector((state: RootState) => state.workspace.zoom);
@@ -54,7 +54,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
       const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
       const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
       
-      dispatch(updateSelectionBox({ x, y }));
+      updateSelectionBox(x, y);
       
       // Calculate selection in real-time
       const left = Math.min(selectionBox.startX, x);
@@ -67,7 +67,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
     };
 
     const handleMouseUp = () => {
-      dispatch(endSelectionBox());
+      endSelectionBox();
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -77,7 +77,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isSelecting, selectionBox, itemIds, zoom, dispatch, canvasRef]);
+  }, [isSelecting, selectionBox, itemIds, zoom, canvasRef, updateSelectionBox, endSelectionBox, selectMultipleItems, itemStore]);
 
   if (!selectionBox.isActive) return null;
 
