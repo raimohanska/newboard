@@ -3,83 +3,8 @@ import * as Y from 'yjs';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { useItemIds } from '../hooks/useItemStore';
 import { RootState } from '../store';
 import type { Note } from '../types';
-
-const SidebarContainer = styled.div`
-  width: 240px;
-  height: 100%;
-  background: #f5f5f5;
-  border-right: 1px solid #ddd;
-  padding: 20px;
-`;
-
-const Title = styled.h2`
-  font-size: 18px;
-  margin-bottom: 20px;
-  color: #333;
-`;
-
-const DraggableNote = styled.div<{ $isDragging: boolean }>`
-  width: 120px;
-  height: 100px;
-  background: #fef68a;
-  border: 1px solid #e6d84e;
-  border-radius: 4px;
-  padding: 12px;
-  cursor: ${props => props.$isDragging ? 'grabbing' : 'grab'};
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
-  font-size: 14px;
-  color: #666;
-  user-select: none;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const DraggingPreview = styled.div`
-  position: fixed;
-  width: 120px;
-  height: 100px;
-  background: #fef68a;
-  border: 1px solid #e6d84e;
-  border-radius: 4px;
-  padding: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: #666;
-  z-index: 1000;
-`;
-
-const TestButton = styled.button`
-  margin-top: 30px;
-  padding: 10px 16px;
-  background: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-
-  &:hover {
-    background: #357abd;
-  }
-
-  &:active {
-    background: #2868a8;
-  }
-`;
 
 export const Sidebar = () => {
   const dispatch = useDispatch();
@@ -177,6 +102,7 @@ export const Sidebar = () => {
         <TestButton onClick={handleAddTestItems}>
           Add 1000 Notes
         </TestButton>
+        <a href="https://github.com/raimohanska/newboard">Source code</a>
       </SidebarContainer>
       {isDragging && (
         <DraggingPreview
@@ -192,3 +118,83 @@ export const Sidebar = () => {
   );
 };
 
+const SidebarContainer = styled.div`
+  width: 240px;
+  height: 100%;
+  background: #f5f5f5;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  a {
+    text-decoration: none;
+    color: #66f;
+  }
+`;
+
+const Title = styled.h2`
+  font-size: 18px;
+  color: #333;
+`;
+
+const DraggableNote = styled.div<{ $isDragging: boolean }>`
+  width: 120px;
+  height: 100px;
+  background: #fef68a;
+  border: 1px solid #e6d84e;
+  border-radius: 4px;
+  padding: 12px;
+  cursor: ${props => props.$isDragging ? 'grabbing' : 'grab'};
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #666;
+  user-select: none;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const DraggingPreview = styled.div`
+  position: fixed;
+  width: 120px;
+  height: 100px;
+  background: #fef68a;
+  border: 1px solid #e6d84e;
+  border-radius: 4px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #666;
+  z-index: 1000;
+`;
+
+const TestButton = styled.button`
+  padding: 10px 16px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+
+  &:hover {
+    background: #357abd;
+  }
+
+  &:active {
+    background: #2868a8;
+  }
+`;
