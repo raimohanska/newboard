@@ -1,5 +1,6 @@
 import * as Y from 'yjs';
 import { HocuspocusProvider } from '@hocuspocus/provider';
+import { IndexeddbPersistence } from 'y-indexeddb';
 import { CanvasItem } from '../types';
 import { Awareness } from 'y-quill';
 
@@ -17,8 +18,6 @@ class ItemStore {
     this.workspaceId = workspaceId;
     this.ydoc = new Y.Doc();
     this.yItems = this.ydoc.getMap<Y.Map<any>>('items');
-    
-    this.loadFromStorage();
     
     // Initialize UndoManager to track changes to yItems (including nested changes)
     this.undoManager = new Y.UndoManager(this.yItems);
@@ -61,31 +60,10 @@ class ItemStore {
     return `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${animals[Math.floor(Math.random() * animals.length)]}`;
   }
 
-  private getStorageKey(): string {
-    return `newboard-workspace-${this.workspaceId}-v3`;
-  }
-
-  private loadFromStorage() {
-    const STORAGE_KEY = this.getStorageKey();
-    const storedData = localStorage.getItem(STORAGE_KEY);
-    if (storedData) {
-      try {
-        const update = Uint8Array.from(JSON.parse(storedData));
-        Y.applyUpdate(this.ydoc, update);
-      } catch (error) {
-        console.error('Failed to load from localStorage:', error);
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
-  }
-
   private setupPersistence() {
-    const STORAGE_KEY = this.getStorageKey();
-    this.ydoc.on('update', () => {
-      const update = Y.encodeStateAsUpdate(this.ydoc);
-      const updateArray = Array.from(update);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updateArray));
-    });
+    // Use IndexedDB for local persistence
+    const dbName = `newboard-workspace-${this.workspaceId}`;
+    new IndexeddbPersistence(dbName, this.ydoc);
   }
 
   private yMapToItem(ymap: Y.Map<any>): CanvasItem {
