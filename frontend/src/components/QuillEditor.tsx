@@ -33,6 +33,7 @@ const EditorContainer = styled.div`
 
 interface QuillEditorProps {
   yText: Y.Text;
+  noteId: string;
 }
 
 export const QuillEditor = ({ yText }: QuillEditorProps) => {

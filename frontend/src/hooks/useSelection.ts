@@ -41,18 +41,26 @@ export function useUpdateSelection() {
     } else {
       awareness.setLocalStateField('selectedNoteIds', [...current, itemId]);
     }
+    
+    // Clear editing state on multi-select
+    awareness.setLocalStateField('editingId', null);
   }, [itemStore]);
 
   const clearSelection = useCallback(() => {
     const awareness = itemStore.getAwareness();
     if (!awareness) return;
     awareness.setLocalStateField('selectedNoteIds', []);
+    awareness.setLocalStateField('editingId', null);
   }, [itemStore]);
 
   const selectMultipleItems = useCallback((itemIds: string[]) => {
     const awareness = itemStore.getAwareness();
     if (!awareness) return;
     awareness.setLocalStateField('selectedNoteIds', itemIds);
+    // Clear editing state on multi-select
+    if (itemIds.length !== 1) {
+      awareness.setLocalStateField('editingId', null);
+    }
   }, [itemStore]);
 
   return { selectItem, toggleSelection, clearSelection, selectMultipleItems };

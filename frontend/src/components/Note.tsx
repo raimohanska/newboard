@@ -4,6 +4,8 @@ import { useItem } from '../hooks/useItemStore';
 import { QuillEditor } from './QuillEditor';
 import { PlainTextView } from './PlainTextView';
 import { useIsSelectedByOthers } from '../hooks/useIsSelectedByOthers';
+import { useIsEditedByOthers } from '../hooks/useIsEditedByOthers';
+import { useAwarenessState } from '../hooks/useAwarenessState';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
 
@@ -34,11 +36,14 @@ interface NoteContentProps {
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
   const note = useItem(noteId) as NoteType;
   const otherSelectedColor = useIsSelectedByOthers(noteId);
+  const isEditedByOthers = useIsEditedByOthers(noteId);
+  const localEditingId = useAwarenessState<string | null>('editingId', null);
   
   if (!note) return null;
 
-  // Show QuillEditor if locally selected OR if another user is editing
-  const showEditor = isSelected || otherSelectedColor !== null;
+  // Show QuillEditor if this note is being edited (locally or by others)
+  const isEditedLocally = localEditingId === noteId;
+  const showEditor = isEditedLocally || isEditedByOthers;
 
   return (
     <NoteContainer
@@ -48,9 +53,9 @@ const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) 
       $othersColor={otherSelectedColor}
     >
       {showEditor ? (
-        <QuillEditor yText={note.content} />
+        <QuillEditor yText={note.content} noteId={noteId} />
       ) : (
-        <PlainTextView yText={note.content} />
+        <PlainTextView yText={note.content} noteId={noteId} />
       )}
     </NoteContainer>
   );
