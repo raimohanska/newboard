@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 
-interface OthersSelection {
-  isSelected: boolean;
-  color: string | null;
-}
+type Color = string
 
-export function useIsSelectedByOthers(itemId: string): OthersSelection {
+export function useIsSelectedByOthers(itemId: string): Color | null {
   const { itemStore } = useWorkspace();
-  const [selection, setSelection] = useState<OthersSelection>({ isSelected: false, color: null });
+  const [selection, setSelection] = useState<Color | null>(null);
 
   useEffect(() => {
     const awareness = itemStore.getAwareness();
     if (!awareness) {
-      setSelection({ isSelected: false, color: null });
+      setSelection(null);
       return;
     }
 
@@ -31,10 +28,7 @@ export function useIsSelectedByOthers(itemId: string): OthersSelection {
         }
       });
 
-      setSelection({
-        isSelected: foundColor !== null,
-        color: foundColor,
-      });
+      setSelection(foundColor);
     };
 
     checkSelection();

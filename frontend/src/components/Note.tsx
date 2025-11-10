@@ -60,19 +60,19 @@ const PlainTextView = memo(({ yText }: PlainTextViewProps) => {
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
   const note = useItem(noteId) as NoteType;
-  const othersSelection = useIsSelectedByOthers(noteId);
+  const otherSelectedColor = useIsSelectedByOthers(noteId);
   
   if (!note) return null;
 
   // Show QuillEditor if locally selected OR if another user is editing
-  const showEditor = isSelected || othersSelection.isSelected;
+  const showEditor = isSelected || otherSelectedColor !== null;
 
   return (
     <NoteContainer
       $isDragging={isDragging}
       $isSelected={isSelected}
-      $isSelectedByOthers={othersSelection.isSelected}
-      $othersColor={othersSelection.color}
+      $isSelectedByOthers={otherSelectedColor !== null}
+      $othersColor={otherSelectedColor}
     >
       {showEditor ? (
         <QuillEditor yText={note.content} />
