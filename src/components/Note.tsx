@@ -2,6 +2,7 @@ import { memo } from 'react';
 import styled from 'styled-components';
 import { itemStore } from '../store/ItemStore';
 import { useItem } from '../hooks/useItemStore';
+import { useNoteText } from '../hooks/useNoteText';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
 
@@ -31,6 +32,7 @@ interface NoteContentProps {
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
   const note = useItem(noteId) as NoteType;
+  const content = useNoteText(note?.content);
   
   if (!note) return null;
 
@@ -44,7 +46,7 @@ const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) 
       $isSelected={isSelected}
     >
       <TextArea
-        value={note.content}
+        value={content}
         onChange={handleContentChange}
         placeholder="Type here..."
       />

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import * as Y from 'yjs';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { itemStore } from '../store/ItemStore';
@@ -103,6 +104,8 @@ export const Sidebar = () => {
   const handleAddTestItems = () => {
     const items: Note[] = [];
     for (let i = 0; i < 1000; i++) {
+      const yText = new Y.Text();
+      yText.insert(0, `Test note ${i + 1}`);
       items.push({
         id: `test-note-${Date.now()}-${i}`,
         type: 'Note',
@@ -110,7 +113,7 @@ export const Sidebar = () => {
           x: Math.random() * 9800,
           y: Math.random() * 9800,
         },
-        content: `Test note ${i + 1}`,
+        content: yText,
       });
     }
     itemStore.bulkCreateItems(items);
@@ -148,6 +151,7 @@ export const Sidebar = () => {
         const scrollWrapper = document.querySelector('[data-scroll-wrapper]') as HTMLElement;
         if (scrollWrapper) {
           const rect = scrollWrapper.getBoundingClientRect();
+          const yText = new Y.Text();
           const newNote: Note = {
             id: `note-${Date.now()}`,
             type: 'Note',
@@ -155,7 +159,7 @@ export const Sidebar = () => {
               x: (e.clientX - rect.left + scrollWrapper.scrollLeft - dragOffset.x) / zoom,
               y: (e.clientY - rect.top + scrollWrapper.scrollTop - dragOffset.y) / zoom,
             },
-            content: '',
+            content: yText,
           };
           itemStore.createItem(newNote);
         }

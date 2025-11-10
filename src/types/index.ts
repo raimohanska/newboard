@@ -1,8 +1,10 @@
+import * as Y from 'yjs';
+
 export interface Note {
   id: string;
   type: "Note";
   position: { x: number; y: number };
-  content: string;
+  content: Y.Text;
 }
 
 export type CanvasItem = Note;

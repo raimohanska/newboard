@@ -49,11 +49,19 @@ class ItemStore {
     };
     
     if (type === 'Note') {
+      let yText = ymap.get('content') as Y.Text;
+      
+      // Ensure Y.Text exists
+      if (!yText || !(yText instanceof Y.Text)) {
+        yText = new Y.Text();
+        ymap.set('content', yText);
+      }
+      
       return {
         id,
         type,
         position,
-        content: ymap.get('content') || '',
+        content: yText,
       };
     }
     
@@ -71,6 +79,7 @@ class ItemStore {
     ymap.set('position', posMap);
     
     if (item.type === 'Note') {
+      // Item already has Y.Text reference
       ymap.set('content', item.content);
     }
     
@@ -104,7 +113,20 @@ class ItemStore {
   updateItemContent(itemId: string, content: string): void {
     const ymap = this.yItems.get(itemId);
     if (ymap && ymap.get('type') === 'Note') {
-      ymap.set('content', content);
+      let yText = ymap.get('content') as Y.Text;
+      
+      // If Y.Text doesn't exist, create it
+      if (!yText || !(yText instanceof Y.Text)) {
+        yText = new Y.Text();
+        ymap.set('content', yText);
+      }
+      
+      // Replace entire text content
+      // For now, simple replacement. Later can do granular edits for better collaboration
+      this.ydoc.transact(() => {
+        yText.delete(0, yText.length);
+        yText.insert(0, content);
+      });
     }
   }
 
@@ -139,7 +161,8 @@ class ItemStore {
     const ymap = this.yItems.get(itemId);
     if (!ymap) return () => {};
 
-    ymap.observeDeep(listener);
+    // Shallow observe - only position changes, not content Y.Text
+    ymap.observe(listener);
     
     const itemsObserver = () => {
       // Notify if item was removed
@@ -150,7 +173,7 @@ class ItemStore {
     this.yItems.observe(itemsObserver);
 
     return () => {
-      ymap.unobserveDeep(listener);
+      ymap.unobserve(listener);
       this.yItems.unobserve(itemsObserver);
     };
   }
