@@ -8,7 +8,7 @@ type ItemsChangeListener = () => void;
 class ItemStore {
   private ydoc: Y.Doc;
   private yItems: Y.Map<Y.Map<any>>;
-  private provider: HocuspocusProvider;
+  private provider: HocuspocusProvider | null = null;
 
   constructor() {
     this.ydoc = new Y.Doc();
@@ -134,8 +134,12 @@ class ItemStore {
     });
   }
 
-  deleteItem(itemId: string): void {
-    this.yItems.delete(itemId);
+  deleteItems(itemIds: string[]): void {
+    this.ydoc.transact(() => {
+      itemIds.forEach(id => {
+        this.yItems.delete(id);
+      });
+    });
   }
 
   // Subscription API for React hooks
