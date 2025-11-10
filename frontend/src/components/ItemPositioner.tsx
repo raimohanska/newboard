@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, ReactNode } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { moveSelectedItems, selectItem, toggleSelection } from '../store/workspaceSlice';
-import { itemStore } from '../store/ItemStore';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useItem } from '../hooks/useItemStore';
 import { RootState } from '../store';
 
@@ -25,6 +25,7 @@ interface ItemPositionerProps {
 export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
   const dispatch = useDispatch();
   const store = useStore<RootState>();
+  const { itemStore } = useWorkspace();
   const item = useItem(itemId);
   const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
   const isSelected = selectedIds.includes(itemId);

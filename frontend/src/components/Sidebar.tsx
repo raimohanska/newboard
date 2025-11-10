@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import * as Y from 'yjs';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { itemStore } from '../store/ItemStore';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useItemIds } from '../hooks/useItemStore';
 import { RootState } from '../store';
 import type { Note } from '../types';
@@ -93,6 +93,7 @@ const TestButton = styled.button`
 
 export const Sidebar = () => {
   const dispatch = useDispatch();
+  const { itemStore } = useWorkspace();
   const itemIds = useItemIds();
   const zoom = useSelector((state: RootState) => state.workspace.zoom);
   const noteCount = itemIds.length;

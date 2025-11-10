@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
-import { itemStore } from '../store/ItemStore';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 
 export const useUndoRedo = () => {
+  const { itemStore } = useWorkspace();
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger undo/redo if typing in an input/textarea or Quill editor
@@ -37,6 +39,6 @@ export const useUndoRedo = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [itemStore]);
 };
 

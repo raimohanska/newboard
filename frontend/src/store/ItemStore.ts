@@ -10,8 +10,10 @@ class ItemStore {
   private yItems: Y.Map<Y.Map<any>>;
   private provider: HocuspocusProvider | null = null;
   private undoManager: Y.UndoManager;
+  private workspaceId: string;
 
-  constructor() {
+  constructor(workspaceId: string) {
+    this.workspaceId = workspaceId;
     this.ydoc = new Y.Doc();
     this.yItems = this.ydoc.getMap<Y.Map<any>>('items');
     
@@ -25,10 +27,10 @@ class ItemStore {
   }
   
   private setupProvider() {
-    // Connect to HocusPocus server
+    // Connect to HocusPocus server with workspace-specific room
     this.provider = new HocuspocusProvider({
       url: 'ws://localhost:1234',
-      name: 'newboard-workspace',
+      name: `workspace-${this.workspaceId}`,
       document: this.ydoc,
       onStatus: (event: any) => {
         console.log('Connection status:', event.status);
@@ -36,8 +38,12 @@ class ItemStore {
     });
   }
 
+  private getStorageKey(): string {
+    return `newboard-workspace-${this.workspaceId}-v3`;
+  }
+
   private loadFromStorage() {
-    const STORAGE_KEY = 'newboard-yjs-v3'; // Changed version for new structure
+    const STORAGE_KEY = this.getStorageKey();
     const storedData = localStorage.getItem(STORAGE_KEY);
     if (storedData) {
       try {
@@ -51,7 +57,7 @@ class ItemStore {
   }
 
   private setupPersistence() {
-    const STORAGE_KEY = 'newboard-yjs-v3';
+    const STORAGE_KEY = this.getStorageKey();
     this.ydoc.on('update', () => {
       const update = Y.encodeStateAsUpdate(this.ydoc);
       const updateArray = Array.from(update);
@@ -194,6 +200,15 @@ class ItemStore {
   }
 }
 
-// Singleton instance
-export const itemStore = new ItemStore();
+// Workspace-specific instances
+const itemStores = new Map<string, ItemStore>();
+
+export function getItemStore(workspaceId: string): ItemStore {
+  if (!itemStores.has(workspaceId)) {
+    itemStores.set(workspaceId, new ItemStore(workspaceId));
+  }
+  return itemStores.get(workspaceId)!;
+}
+
+export type { ItemStore };
 

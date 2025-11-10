@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { useDispatch, useStore } from 'react-redux';
-import { itemStore } from '../store/ItemStore';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { clearSelection } from '../store/workspaceSlice';
 import { RootState } from '../store';
 
 export const useDeleteSelectedItems = () => {
   const dispatch = useDispatch();
   const store = useStore<RootState>();
+  const { itemStore } = useWorkspace();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -42,6 +43,6 @@ export const useDeleteSelectedItems = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [store, dispatch]);
+  }, [store, dispatch, itemStore]);
 };
 
