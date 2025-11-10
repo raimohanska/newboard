@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "npm run db:start && concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
     "build": "npm run build -w frontend",
+    "start": "npm run start -w backend",
     "db:start": "docker-compose up -d",
     "db:stop": "docker-compose down",
     "db:logs": "docker-compose logs -f postgres",
