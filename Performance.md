@@ -35,6 +35,12 @@ If you need some state in event handlers, consider taking the state directly fro
 
 [Commit 60393d7d](https://github.com/raimohanska/newboard/commit/60393d7d58c669af50ce154ebbcf2208c9b95212)
 
+### Be careful with objects and arrays in state and Contexts
+
+Remember that objects and arrays are not considered equal as in `===` unless they are the same object instance. Hence, if you set an object or array to state using `setState` you'll always trigger a render. This is another reason to avoid `setState` altogether.
+
+[Commit 267feccf](https://github.com/raimohanska/newboard/commit/267feccff5fc90b0665226362bbb176e3af31302)
+
 ### Consider a mutable state store
 
 Consider mutable state store. If your state is large, it will be expensive to clone it on every change. Using, for instance, a Y.js document may prove more performant, as there's no cloning.
