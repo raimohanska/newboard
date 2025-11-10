@@ -32,6 +32,9 @@ export const Canvas = memo((() => {
       // Check if clicking on canvas (not on a note)
       if (e.target !== e.currentTarget) return;
 
+      // Clear selection when clicking on canvas background
+      dispatch(clearSelection());
+
       // Start rectangular selection on canvas drag
       e.preventDefault();
       const scrollWrapper = canvasRef.current?.parentElement?.parentElement;
