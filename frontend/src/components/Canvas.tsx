@@ -6,6 +6,8 @@ import { useItemIds } from '../hooks/useItemStore';
 import { RootState } from '../store';
 import { Note } from './Note';
 import { RectangularSelection } from './RectangularSelection';
+import { Cursors } from './Cursors';
+import { useUpdateCursor } from '../hooks/useAwareness';
 import { increaseRenderCount } from '../utils/renderCounts';
 
 const CanvasContainer = styled.div`
@@ -25,8 +27,25 @@ export const Canvas = memo((() => {
     const dispatch = useDispatch();
     const store = useStore<RootState>();
     const itemIds = useItemIds();
+    const updateCursor = useUpdateCursor();
 
     const canvasRef = useRef<HTMLDivElement>(null);
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+      const scrollWrapper = canvasRef.current?.parentElement?.parentElement;
+      if (!scrollWrapper) return;
+
+      const zoom = store.getState().workspace.zoom;
+      const wrapperRect = scrollWrapper.getBoundingClientRect();
+      const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
+      const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
+
+      updateCursor(x, y);
+    };
+
+    const handleMouseLeave = () => {
+      updateCursor(null, null);
+    };
 
     const handleMouseDown = (e: React.MouseEvent) => {
       // Check if clicking on canvas (not on a note)
@@ -51,11 +70,17 @@ export const Canvas = memo((() => {
     };
 
     return (
-      <CanvasContainer ref={canvasRef} onMouseDown={handleMouseDown}>
+      <CanvasContainer 
+        ref={canvasRef} 
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
         {itemIds.map(id => (
           <Note key={id} noteId={id} />
         ))}
         <RectangularSelection canvasRef={canvasRef} />
+        <Cursors />
       </CanvasContainer>
     );
   }));

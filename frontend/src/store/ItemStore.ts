@@ -118,6 +118,10 @@ class ItemStore {
     return ymap ? this.yMapToItem(ymap) : undefined;
   }
 
+  getAwareness() {
+    return this.provider?.awareness || null;
+  }
+
   createItem(item: CanvasItem): void {
     const ymap = this.itemToYMap(item);
     this.yItems.set(item.id, ymap);
