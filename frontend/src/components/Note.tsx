@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useItem } from '../hooks/useItemStore';
 import { useYText } from '../hooks/useYText';
 import { QuillEditor } from './QuillEditor';
+import { useIsOthersEditing } from '../hooks/useIsOthersEditing';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
 
@@ -57,15 +58,19 @@ const PlainTextView = memo(({ yText }: PlainTextViewProps) => {
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
   const note = useItem(noteId) as NoteType;
+  const isOthersEditing = useIsOthersEditing(noteId);
   
   if (!note) return null;
+
+  // Show QuillEditor if locally selected OR if another user is editing
+  const showEditor = isSelected || isOthersEditing;
 
   return (
     <NoteContainer
       $isDragging={isDragging}
       $isSelected={isSelected}
     >
-      {isSelected ? (
+      {showEditor ? (
         <QuillEditor yText={note.content} />
       ) : (
         <PlainTextView yText={note.content} />
