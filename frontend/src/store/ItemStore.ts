@@ -27,9 +27,17 @@ class ItemStore {
   }
   
   private setupProvider() {
+    // Derive WebSocket URL from document location
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = window.location.hostname;
+    const wsPort = window.location.port;
+    const wsUrl = wsPort 
+      ? `${wsProtocol}//${wsHost}:${wsPort}`
+      : `${wsProtocol}//${wsHost}`;
+
     // Connect to HocusPocus server with workspace-specific room
     this.provider = new HocuspocusProvider({
-      url: 'ws://localhost:1234',
+      url: wsUrl,
       name: `workspace-${this.workspaceId}`,
       document: this.ydoc,
       onStatus: (event: any) => {
