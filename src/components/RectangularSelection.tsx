@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectMultipleItems, updateSelectionBox, endSelectionBox } from '../store/workspaceSlice';
-import { selectItemIds } from '../store/selectors';
+import { useYjsItemIds } from '../hooks/useYjsItems';
+import { yItems, yMapToItem } from '../store/yjs';
 import { RootState } from '../store';
 
 const SelectionBox = styled.div`
@@ -21,8 +22,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
   const dispatch = useDispatch();
   const selectionBox = useSelector((state: RootState) => state.workspace.selectionBox);
   const isSelecting = selectionBox.isActive;
-  const itemIds = useSelector(selectItemIds);
-  const items = useSelector((state: RootState) => state.workspace.items);
+  const itemIds = useYjsItemIds();
   const zoom = useSelector((state: RootState) => state.workspace.zoom);
   
   useEffect(() => {
@@ -30,13 +30,14 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
 
     const calculateIntersection = (left: number, right: number, top: number, bottom: number) => {
       return itemIds.filter(id => {
-        const item = items[id];
-        if (!item) return false;
+        const ymap = yItems.get(id);
+        if (!ymap) return false;
         
+        const item = yMapToItem(ymap);
         const noteLeft = item.position.x;
         const noteTop = item.position.y;
         const noteRight = noteLeft + 200; // Note width
-        const noteBottom = noteTop + 150; // Note min-height
+        const noteBottom = noteTop + 150; // Note height
         
         // Check for intersection
         return !(noteRight < left || noteLeft > right || noteBottom < top || noteTop > bottom);
@@ -74,7 +75,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isSelecting, selectionBox, itemIds, items, zoom, dispatch, canvasRef]);
+  }, [isSelecting, selectionBox, itemIds, zoom, dispatch, canvasRef]);
 
   if (!selectionBox.isActive) return null;
 

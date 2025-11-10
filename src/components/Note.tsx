@@ -1,8 +1,7 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateItemContent } from '../store/workspaceSlice';
-import { selectItemById } from '../store/selectors';
+import { updateItemContent } from '../store/itemOperations';
+import { useYjsItem } from '../hooks/useYjsItems';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
 
@@ -31,17 +30,12 @@ interface NoteContentProps {
 }
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
-  const dispatch = useDispatch();
-  const selectNote = useMemo(() => selectItemById(noteId), [noteId]);
-  const note = useSelector(selectNote) as NoteType;
+  const note = useYjsItem(noteId) as NoteType;
   
   if (!note) return null;
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    dispatch(updateItemContent({
-      id: noteId,
-      content: e.target.value,
-    }));
+    updateItemContent(noteId, e.target.value);
   };
 
   return (

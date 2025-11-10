@@ -1,8 +1,8 @@
 import { useRef, memo } from 'react';
 import styled from 'styled-components';
-import { useSelector, useDispatch, useStore } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 import { clearSelection, startSelectionBox } from '../store/workspaceSlice';
-import { selectItemIds } from '../store/selectors';
+import { useYjsItemIds } from '../hooks/useYjsItems';
 import { RootState } from '../store';
 import { Note } from './Note';
 import { RectangularSelection } from './RectangularSelection';
@@ -24,7 +24,7 @@ export const Canvas = memo((() => {
     increaseRenderCount('Canvas');
     const dispatch = useDispatch();
     const store = useStore<RootState>();
-    const itemIds = useSelector(selectItemIds);
+    const itemIds = useYjsItemIds();
 
     const canvasRef = useRef<HTMLDivElement>(null);
 

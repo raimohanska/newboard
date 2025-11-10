@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Workspace, CanvasItem } from '../types';
-import { loadWorkspace } from '../utils/storage';
 
-interface WorkspaceState extends Workspace {
+interface WorkspaceState {
   selectedIds: string[];
   selectionBox: {
     isActive: boolean;
@@ -18,10 +16,7 @@ interface WorkspaceState extends Workspace {
   } | null;
 }
 
-const loadedWorkspace = loadWorkspace();
-
 const initialState: WorkspaceState = {
-  items: loadedWorkspace?.items || {},
   selectedIds: [],
   selectionBox: {
     isActive: false,
@@ -38,15 +33,6 @@ const workspaceSlice = createSlice({
   name: 'workspace',
   initialState,
   reducers: {
-    createItem: (state: WorkspaceState, action: PayloadAction<CanvasItem>) => {
-      state.items[action.payload.id] = action.payload;
-    },
-    moveItem: (state: WorkspaceState, action: PayloadAction<{ id: string; position: { x: number; y: number } }>) => {
-      const item = state.items[action.payload.id];
-      if (item) {
-        item.position = action.payload.position;
-      }
-    },
     moveSelectedItems: (state: WorkspaceState, action: PayloadAction<{ delta: { x: number; y: number } }>) => {
       const { delta } = action.payload;
       if (!state.dragOffset) {
@@ -56,26 +42,8 @@ const workspaceSlice = createSlice({
       state.dragOffset.y += delta.y;
     },
     commitDrag: (state: WorkspaceState) => {
-      if (state.dragOffset) {
-        state.selectedIds.forEach(id => {
-          const item = state.items[id];
-          if (item) {
-            item.position.x += state.dragOffset!.x;
-            item.position.y += state.dragOffset!.y;
-          }
-        });
-        state.dragOffset = null;
-      }
-    },
-    updateItemContent: (state: WorkspaceState, action: PayloadAction<{ id: string; content: string }>) => {
-      const item = state.items[action.payload.id];
-      if (item && item.type === 'Note') {
-        item.content = action.payload.content;
-      }
-    },
-    deleteItem: (state: WorkspaceState, action: PayloadAction<string>) => {
-      delete state.items[action.payload];
-      state.selectedIds = state.selectedIds.filter(id => id !== action.payload);
+      // Drag offset will be applied to Y.js items outside of Redux
+      state.dragOffset = null;
     },
     selectItem: (state: WorkspaceState, action: PayloadAction<string>) => {
       state.selectedIds = [action.payload];
@@ -94,11 +62,6 @@ const workspaceSlice = createSlice({
     },
     selectMultipleItems: (state: WorkspaceState, action: PayloadAction<string[]>) => {
       state.selectedIds = action.payload;
-    },
-    bulkCreateItems: (state: WorkspaceState, action: PayloadAction<CanvasItem[]>) => {
-      action.payload.forEach(item => {
-        state.items[item.id] = item;
-      });
     },
     startSelectionBox: (state: WorkspaceState, action: PayloadAction<{ x: number; y: number }>) => {
       state.selectionBox.isActive = true;
@@ -121,17 +84,12 @@ const workspaceSlice = createSlice({
 });
 
 export const { 
-  createItem, 
-  moveItem, 
   moveSelectedItems,
   commitDrag,
-  updateItemContent, 
-  deleteItem,
   selectItem,
   toggleSelection,
   clearSelection,
   selectMultipleItems,
-  bulkCreateItems,
   startSelectionBox,
   updateSelectionBox,
   endSelectionBox,
