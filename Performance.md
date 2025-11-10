@@ -11,7 +11,7 @@ Make sure your root component is not re-rendered unnecessarily. In this case, [`
 - Before: Canvas component had `useSelector` that reacted to changes in all items
 - After: Canvas component only tracks the list of IDs, and doesn't need to re-render
 
-Commit: 0136a181e7333ca680c26ee5ad7dc5ae8d600de7
+[Commit 0136a181](https://github.com/raimohanska/newboard/commit/0136a181e7333ca680c26ee5ad7dc5ae8d600de7)
 
 ### Use memoized selectors
 
@@ -19,7 +19,7 @@ Make sure to use memoized selectors, to avoid rendering when nothing relevant ha
 
 Use `fast-deep-equal` or similar for comparing objects. In Redux, you can use `createSelector` with `memoizeOptions`.
 
-Commit: 0136a181e7333ca680c26ee5ad7dc5ae8d600de7
+[Commit 0136a181](https://github.com/raimohanska/newboard/commit/0136a181e7333ca680c26ee5ad7dc5ae8d600de7)
 
 ### Split to components based on update frequency
 
@@ -27,13 +27,13 @@ If your component reacts to state slices with different update frequency, consid
 
 For instance in [`Note.tsx`](frontend/src/components/Note.tsx), I extracted the more render-heavy stuff into an inner component `NoteContent`, that doesn't need to be re-rendered if note position changes. Memoization is of course needed to prevent the inner component from rendering each time the outer one is rendered!
 
-Commit: 2b1a741d19bb5c05c1c9f7fa2f790016e5af7401
+[Commit 2b1a741d](https://github.com/raimohanska/newboard/commit/2b1a741d19bb5c05c1c9f7fa2f790016e5af7401)
 
 ### Use non-reactive state access in event handlers
 
 If you need some state in event handlers, consider taking the state directly from your state store in the handler, instead of using `useSelector`. Otherwise your component will render whenever this state changes, even though you only need the data in an event handler.
 
-Commit: 60393d7d58c669af50ce154ebbcf2208c9b95212
+[Commit 60393d7d](https://github.com/raimohanska/newboard/commit/60393d7d58c669af50ce154ebbcf2208c9b95212)
 
 ### Consider a mutable state store
 
@@ -41,19 +41,19 @@ Consider mutable state store. If your state is large, it will be expensive to cl
 
 In this case I moved document state to Y.js document (see [`ItemStore.ts`](frontend/src/store/ItemStore.ts)), which is a mutable state store (among other things). 
 
-Commit: 7fa88b1232b1bd6cc63f703bf352089f4c4b8e9b
+[Commit 7fa88b12](https://github.com/raimohanska/newboard/commit/7fa88b1232b1bd6cc63f703bf352089f4c4b8e9b)
 
 ### Lazy initialization with viewport detection
 
 Initialize expensive stuff only if your component is actually in viewport. Create a `useIsInViewPort` hook. Note: this hook was later removed from this project when we switched to conditional rendering instead.
 
-Commit: 1f46f47fa1a7d036007b867221d9393e71a180ed
+[Commit 1f46f47f](https://github.com/raimohanska/newboard/commit/1f46f47fa1a7d036007b867221d9393e71a180ed)
 
 ### Conditional rendering
 
 Initialize expensive stuff only when needed. Quill text editor, for instance, is a bit expensive if instantiated for thousands of texts. You may use a simpler component for a read-only view. In this case, a `PlainTextView` component is used instead for Notes that are not selected. See [`Note.tsx`](frontend/src/components/Note.tsx) and [`QuillEditor.tsx`](frontend/src/components/QuillEditor.tsx).
 
-Commit: 14bae23ff3e6f136ce4fdc2cbf6184cfb367b0cc
+[Commit 14bae23f](https://github.com/raimohanska/newboard/commit/14bae23ff3e6f136ce4fdc2cbf6184cfb367b0cc)
 
 ### CSS content-visibility
 
@@ -61,7 +61,7 @@ Consider CSS `content-visibility: auto`, which might speed things up if browser 
 
 See the `ItemPositionerContainer` styled component in [`ItemPositioner.tsx`](frontend/src/components/ItemPositioner.tsx).
 
-Commit: 2b1a741d19bb5c05c1c9f7fa2f790016e5af7401
+[Commit 2b1a741d](https://github.com/raimohanska/newboard/commit/2b1a741d19bb5c05c1c9f7fa2f790016e5af7401)
 
 ## Performance measurements
 
