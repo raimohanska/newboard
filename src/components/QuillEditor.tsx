@@ -8,29 +8,14 @@ import 'quill/dist/quill.snow.css';
 
 const EditorContainer = styled.div`
   width: 100%;
-  height: 100%;
   cursor: text;
-
-  .ql-container {
-    border: none;
-    font-size: 14px;
-    font-family: inherit;
-  }
+  height: initial;
+  border: none !important;
 
   .ql-editor {
     padding: 0;
     min-height: 30px;
     cursor: text;
-  }
-
-  .ql-editor.ql-blank::before {
-    font-style: normal;
-    color: #999;
-    left: 0;
-  }
-
-  .ql-editor p {
-    margin: 0;
   }
 `;
 
