@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, ReactNode } from 'react';
 import styled from 'styled-components';
-import { useDispatch, useSelector, useStore } from 'react-redux';
-import { selectItem, toggleSelection } from '../store/workspaceSlice';
+import { useStore } from 'react-redux';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useItem } from '../hooks/useItemStore';
 import { useDragOffset } from '../hooks/useDragOffset';
+import { getSelectedIds, useIsSelected, useUpdateSelection } from '../hooks/useSelection';
 import { RootState } from '../store';
 
 const ItemPositionerContainer = styled.div`
@@ -24,12 +24,11 @@ interface ItemPositionerProps {
 }
 
 export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
-  const dispatch = useDispatch();
   const store = useStore<RootState>();
   const { itemStore } = useWorkspace();
   const item = useItem(itemId);
-  const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
-  const isSelected = selectedIds.includes(itemId);
+  const isSelected = useIsSelected(itemId);
+  const { selectItem, toggleSelection } = useUpdateSelection();
   
   // Get drag offset from awareness (local or others)
   const dragOffset = useDragOffset(itemId);
@@ -62,9 +61,9 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
     
     // Handle selection
     if (e.shiftKey) {
-      dispatch(toggleSelection(itemId));
+      toggleSelection(itemId);
     } else if (!isSelected) {
-      dispatch(selectItem(itemId));
+      selectItem(itemId);
     }
     
     // Start dragging
@@ -104,16 +103,15 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
       setIsDragging(false);
       
       // Commit positions to Y.js
-      if (dragOffsetRef.current.x !== 0 || dragOffsetRef.current.y !== 0) {
+      if (awareness && (dragOffsetRef.current.x !== 0 || dragOffsetRef.current.y !== 0)) {
+        const selectedIds = getSelectedIds(awareness);
         itemStore.updateItemPositions(
-          store.getState().workspace.selectedIds,
+          selectedIds,
           dragOffsetRef.current.x,
           dragOffsetRef.current.y
         );
-      }
-      
-      // Clear drag offset from awareness
-      if (awareness) {
+        
+        // Clear drag offset from awareness
         awareness.setLocalStateField('dragOffset', null);
       }
     };

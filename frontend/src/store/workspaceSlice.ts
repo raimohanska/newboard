@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface WorkspaceState {
-  selectedIds: string[];
   selectionBox: {
     isActive: boolean;
     startX: number;
@@ -13,7 +12,6 @@ interface WorkspaceState {
 }
 
 const initialState: WorkspaceState = {
-  selectedIds: [],
   selectionBox: {
     isActive: false,
     startX: 0,
@@ -28,24 +26,6 @@ const workspaceSlice = createSlice({
   name: 'workspace',
   initialState,
   reducers: {
-    selectItem: (state: WorkspaceState, action: PayloadAction<string>) => {
-      state.selectedIds = [action.payload];
-    },
-    toggleSelection: (state: WorkspaceState, action: PayloadAction<string>) => {
-      const id = action.payload;
-      const index = state.selectedIds.indexOf(id);
-      if (index > -1) {
-        state.selectedIds.splice(index, 1);
-      } else {
-        state.selectedIds.push(id);
-      }
-    },
-    clearSelection: (state: WorkspaceState) => {
-      state.selectedIds = [];
-    },
-    selectMultipleItems: (state: WorkspaceState, action: PayloadAction<string[]>) => {
-      state.selectedIds = action.payload;
-    },
     startSelectionBox: (state: WorkspaceState, action: PayloadAction<{ x: number; y: number }>) => {
       state.selectionBox.isActive = true;
       state.selectionBox.startX = action.payload.x;
@@ -67,10 +47,6 @@ const workspaceSlice = createSlice({
 });
 
 export const { 
-  selectItem,
-  toggleSelection,
-  clearSelection,
-  selectMultipleItems,
   startSelectionBox,
   updateSelectionBox,
   endSelectionBox,

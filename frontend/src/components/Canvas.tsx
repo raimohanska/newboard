@@ -1,8 +1,9 @@
 import { useRef, memo } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useStore } from 'react-redux';
-import { clearSelection, startSelectionBox } from '../store/workspaceSlice';
+import { startSelectionBox } from '../store/workspaceSlice';
 import { useItemIds } from '../hooks/useItemStore';
+import { useUpdateSelection } from '../hooks/useSelection';
 import { RootState } from '../store';
 import { Note } from './Note';
 import { RectangularSelection } from './RectangularSelection';
@@ -28,6 +29,7 @@ export const Canvas = memo((() => {
     const store = useStore<RootState>();
     const itemIds = useItemIds();
     const updateCursor = useUpdateCursor();
+    const { clearSelection } = useUpdateSelection();
 
     const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +54,7 @@ export const Canvas = memo((() => {
       if (e.target !== e.currentTarget) return;
 
       // Clear selection when clicking on canvas background
-      dispatch(clearSelection());
+      clearSelection();
 
       // Start rectangular selection on canvas drag
       e.preventDefault();

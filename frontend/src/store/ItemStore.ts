@@ -1,6 +1,7 @@
 import * as Y from 'yjs';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import { CanvasItem } from '../types';
+import { Awareness } from 'y-quill';
 
 type ItemChangeListener = () => void;
 type ItemsChangeListener = () => void;
@@ -140,7 +141,7 @@ class ItemStore {
     return ymap ? this.yMapToItem(ymap) : undefined;
   }
 
-  getAwareness() {
+  getAwareness(): Awareness | null {
     return this.provider?.awareness || null;
   }
 

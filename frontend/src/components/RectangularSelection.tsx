@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectMultipleItems, updateSelectionBox, endSelectionBox } from '../store/workspaceSlice';
+import { updateSelectionBox, endSelectionBox } from '../store/workspaceSlice';
 import { useItemIds } from '../hooks/useItemStore';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useUpdateSelection } from '../hooks/useSelection';
 import { RootState } from '../store';
 
 const SelectionBox = styled.div`
@@ -21,6 +22,7 @@ interface RectangularSelectionProps {
 export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) => {
   const dispatch = useDispatch();
   const { itemStore } = useWorkspace();
+  const { selectMultipleItems } = useUpdateSelection();
   const selectionBox = useSelector((state: RootState) => state.workspace.selectionBox);
   const isSelecting = selectionBox.isActive;
   const itemIds = useItemIds();
@@ -61,7 +63,7 @@ export const RectangularSelection = ({ canvasRef }: RectangularSelectionProps) =
       const bottom = Math.max(selectionBox.startY, y);
       
       const selectedIds = calculateIntersection(left, right, top, bottom);
-      dispatch(selectMultipleItems(selectedIds));
+      selectMultipleItems(selectedIds);
     };
 
     const handleMouseUp = () => {
