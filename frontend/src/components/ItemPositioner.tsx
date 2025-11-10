@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, ReactNode } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import { moveSelectedItems, selectItem, toggleSelection } from '../store/workspaceSlice';
+import { selectItem, toggleSelection } from '../store/workspaceSlice';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useItem } from '../hooks/useItemStore';
-import { useOthersDragOffset } from '../hooks/useOthersDragOffset';
+import { useDragOffset } from '../hooks/useDragOffset';
 import { RootState } from '../store';
 
 const ItemPositionerContainer = styled.div`
@@ -31,22 +31,17 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
   const selectedIds = useSelector((state: RootState) => state.workspace.selectedIds);
   const isSelected = selectedIds.includes(itemId);
   
-  // Only observe dragOffset if this item is selected
-  const localDragOffset = useSelector(
-    (state: RootState) => isSelected ? state.workspace.dragOffset : null
-  );
-  
-  // Get other users' drag offset for this item
-  const othersDragOffset = useOthersDragOffset(itemId);
+  // Get drag offset from awareness (local or others)
+  const dragOffset = useDragOffset(itemId);
   
   if (!item) return null;
   
   const [isDragging, setIsDragging] = useState(false);
   const lastMousePosRef = useRef({ x: 0, y: 0 });
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Apply drag offset (local has priority over others)
-  const dragOffset = localDragOffset || othersDragOffset;
+  // Apply drag offset
   const displayPosition = dragOffset
     ? { x: item.position.x + dragOffset.x, y: item.position.y + dragOffset.y }
     : item.position;
@@ -75,10 +70,13 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
     // Start dragging
     setIsDragging(true);
     lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+    dragOffsetRef.current = { x: 0, y: 0 };
   };
 
   useEffect(() => {
     if (!isDragging) return;
+
+    const awareness = itemStore.getAwareness();
 
     const handleMouseMove = (e: MouseEvent) => {
       // Get zoom from store at interaction time (not reactive)
@@ -90,8 +88,13 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
       };
       
       if (isSelected) {
-        // Move all selected items
-        dispatch(moveSelectedItems({ delta }));
+        // Update drag offset in awareness
+        dragOffsetRef.current.x += delta.x;
+        dragOffsetRef.current.y += delta.y;
+        
+        if (awareness) {
+          awareness.setLocalStateField('dragOffset', { ...dragOffsetRef.current });
+        }
       }
       
       lastMousePosRef.current = { x: e.clientX, y: e.clientY };
@@ -101,16 +104,18 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
       setIsDragging(false);
       
       // Commit positions to Y.js
-      const dragOffset = store.getState().workspace.dragOffset;
-      if (dragOffset) {
+      if (dragOffsetRef.current.x !== 0 || dragOffsetRef.current.y !== 0) {
         itemStore.updateItemPositions(
           store.getState().workspace.selectedIds,
-          dragOffset.x,
-          dragOffset.y
+          dragOffsetRef.current.x,
+          dragOffsetRef.current.y
         );
       }
       
-      dispatch({ type: 'workspace/commitDrag' });
+      // Clear drag offset from awareness
+      if (awareness) {
+        awareness.setLocalStateField('dragOffset', null);
+      }
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -120,7 +125,7 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, isSelected, store, dispatch]);
+  }, [isDragging, isSelected, store, itemStore]);
 
   return (
     <ItemPositionerContainer

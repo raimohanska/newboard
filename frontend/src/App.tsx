@@ -5,7 +5,6 @@ import { ScrollWrapper } from './components/ScrollWrapper';
 import { useDeleteSelectedItems } from './hooks/useDeleteSelectedItems';
 import { useUndoRedo } from './hooks/useUndoRedo';
 import { useUpdateSelection } from './hooks/useUpdateSelection';
-import { useUpdateDragOffset } from './hooks/useUpdateDragOffset';
 
 const AppContainer = styled.div`
   display: flex;
@@ -17,7 +16,6 @@ function App() {
   useDeleteSelectedItems();
   useUndoRedo();
   useUpdateSelection();
-  useUpdateDragOffset();
 
   return (
     <>

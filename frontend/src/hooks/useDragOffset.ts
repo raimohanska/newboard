@@ -6,7 +6,7 @@ interface DragOffset {
   y: number;
 }
 
-export function useOthersDragOffset(itemId: string): DragOffset | null {
+export function useDragOffset(itemId: string): DragOffset | null {
   const { itemStore } = useWorkspace();
   const [offset, setOffset] = useState<DragOffset | null>(null);
 
@@ -21,11 +21,8 @@ export function useOthersDragOffset(itemId: string): DragOffset | null {
       const states = awareness.getStates();
       let foundOffset: DragOffset | null = null;
 
-      states.forEach((state, clientId) => {
-        // Skip local client
-        if (clientId === awareness.clientID) return;
-
-        // Check if this client is dragging our item
+      states.forEach((state) => {
+        // Check both local and remote clients
         const selectedNoteIds = state.selectedNoteIds || [];
         const dragOffset = state.dragOffset;
 

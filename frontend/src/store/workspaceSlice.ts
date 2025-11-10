@@ -10,10 +10,6 @@ interface WorkspaceState {
     endY: number;
   };
   zoom: number;
-  dragOffset: {
-    x: number;
-    y: number;
-  } | null;
 }
 
 const initialState: WorkspaceState = {
@@ -26,25 +22,12 @@ const initialState: WorkspaceState = {
     endY: 0,
   },
   zoom: 1,
-  dragOffset: null,
 };
 
 const workspaceSlice = createSlice({
   name: 'workspace',
   initialState,
   reducers: {
-    moveSelectedItems: (state: WorkspaceState, action: PayloadAction<{ delta: { x: number; y: number } }>) => {
-      const { delta } = action.payload;
-      if (!state.dragOffset) {
-        state.dragOffset = { x: 0, y: 0 };
-      }
-      state.dragOffset.x += delta.x;
-      state.dragOffset.y += delta.y;
-    },
-    commitDrag: (state: WorkspaceState) => {
-      // Drag offset will be applied to Y.js items outside of Redux
-      state.dragOffset = null;
-    },
     selectItem: (state: WorkspaceState, action: PayloadAction<string>) => {
       state.selectedIds = [action.payload];
     },
@@ -84,8 +67,6 @@ const workspaceSlice = createSlice({
 });
 
 export const { 
-  moveSelectedItems,
-  commitDrag,
   selectItem,
   toggleSelection,
   clearSelection,
