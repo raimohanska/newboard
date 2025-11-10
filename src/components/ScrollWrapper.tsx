@@ -48,13 +48,16 @@ export const ScrollWrapper = () => {
       const delta = e.deltaY * -0.01;
       const newZoom = Math.max(0.1, Math.min(5, zoom + delta * zoom * 0.5));
 
+      // Calculate new scroll positions BEFORE updating zoom
+      const newScrollLeft = canvasX * newZoom - mouseX;
+      const newScrollTop = canvasY * newZoom - mouseY;
+
+      // Update zoom
       dispatch(setZoom(newZoom));
 
-      // Adjust scroll to keep mouse position fixed
-      requestAnimationFrame(() => {
-        wrapper.scrollLeft = canvasX * newZoom - mouseX;
-        wrapper.scrollTop = canvasY * newZoom - mouseY;
-      });
+      // Adjust scroll immediately (synchronously) to keep mouse position fixed
+      wrapper.scrollLeft = newScrollLeft;
+      wrapper.scrollTop = newScrollTop;
     };
 
     wrapper.addEventListener('wheel', handleWheel, { passive: false });
