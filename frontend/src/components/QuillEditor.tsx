@@ -1,9 +1,13 @@
 import { useEffect, useRef } from 'react';
 import Quill from 'quill';
+import QuillCursors from 'quill-cursors';
 import { QuillBinding } from 'y-quill';
 import * as Y from 'yjs';
 import styled from 'styled-components';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import 'quill/dist/quill.snow.css';
+
+Quill.register('modules/cursors', QuillCursors);
 
 const EditorContainer = styled.div`
   width: 100%;
@@ -15,6 +19,7 @@ const EditorContainer = styled.div`
     padding: 0;
     min-height: 30px;
     cursor: text;
+    position: relative;
   }
 `;
 
@@ -23,6 +28,7 @@ interface QuillEditorProps {
 }
 
 export const QuillEditor = ({ yText }: QuillEditorProps) => {
+  const { itemStore } = useWorkspace();
   const containerRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
   const bindingRef = useRef<QuillBinding | null>(null);
@@ -34,6 +40,7 @@ export const QuillEditor = ({ yText }: QuillEditorProps) => {
     const quill = new Quill(containerRef.current, {
       modules: {
         toolbar: false,
+        cursors: true,
       },
       placeholder: 'Type here...',
       theme: 'snow',
@@ -41,15 +48,16 @@ export const QuillEditor = ({ yText }: QuillEditorProps) => {
 
     quillRef.current = quill;
 
-    // Bind Y.Text to Quill
-    bindingRef.current = new QuillBinding(yText, quill);
+    // Bind Y.Text to Quill with awareness for collaborative cursors
+    const awareness = itemStore.getAwareness();
+    bindingRef.current = new QuillBinding(yText, quill, awareness || undefined);
 
     return () => {
       bindingRef.current?.destroy();
       bindingRef.current = null;
       quillRef.current = null;
     };
-  }, [yText]);
+  }, [yText, itemStore]);
 
   return <EditorContainer ref={containerRef} />;
 };

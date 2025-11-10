@@ -38,21 +38,21 @@ export const Cursors = () => {
 
   return (
     <>
-      {Array.from(otherUsers.values()).map(({ clientId, cursor }) => {
-        if (!cursor) return null;
+      {Array.from(otherUsers.values()).map(({ clientId, canvasCursor }) => {
+        if (!canvasCursor) return null;
 
         return (
           <CursorContainer
             key={clientId}
-            $x={cursor.x}
-            $y={cursor.y}
-            $color={cursor.color}
+            $x={canvasCursor.x}
+            $y={canvasCursor.y}
+            $color={canvasCursor.color}
           >
-            <CursorSvg $color={cursor.color} viewBox="0 0 24 24">
+            <CursorSvg $color={canvasCursor.color} viewBox="0 0 24 24">
               <path d="M5.65376 12.3673L1 3L11.3612 7.26604L8.70696 10.3111L14.372 16.6796L12.1766 18.75L6.51163 12.3673H5.65376Z" />
             </CursorSvg>
-            <CursorLabel $color={cursor.color}>
-              {cursor.name}
+            <CursorLabel $color={canvasCursor.color}>
+              {canvasCursor.name}
             </CursorLabel>
           </CursorContainer>
         );
