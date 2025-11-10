@@ -1,4 +1,5 @@
 import * as Y from 'yjs';
+import { HocuspocusProvider } from '@hocuspocus/provider';
 import { CanvasItem } from '../types';
 
 type ItemChangeListener = () => void;
@@ -7,6 +8,7 @@ type ItemsChangeListener = () => void;
 class ItemStore {
   private ydoc: Y.Doc;
   private yItems: Y.Map<Y.Map<any>>;
+  private provider: HocuspocusProvider;
 
   constructor() {
     this.ydoc = new Y.Doc();
@@ -14,6 +16,19 @@ class ItemStore {
 
     this.loadFromStorage();
     this.setupPersistence();
+    this.setupProvider();
+  }
+  
+  private setupProvider() {
+    // Connect to HocusPocus server
+    this.provider = new HocuspocusProvider({
+      url: 'ws://localhost:1234',
+      name: 'newboard-workspace',
+      document: this.ydoc,
+      onStatus: (event: any) => {
+        console.log('Connection status:', event.status);
+      },
+    });
   }
 
   private loadFromStorage() {
