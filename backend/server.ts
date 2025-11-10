@@ -1,6 +1,7 @@
 import { Server } from '@hocuspocus/server';
 import { runner } from 'node-pg-migrate';
 import { config } from './config.js';
+import { PostgreSqlPersistence } from './PostgreSqlPersistence.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -29,6 +30,10 @@ async function startServer() {
 
   const server = Server.configure({
     port: config.server.port,
+
+    extensions: [
+      new PostgreSqlPersistence(),
+    ],
     
     onConnect: async () => {
       console.log('Client connected');

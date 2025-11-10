@@ -1,0 +1,8 @@
+-- Up Migration
+CREATE TABLE workspace_updates (
+  id SERIAL PRIMARY KEY,
+  workspace_id VARCHAR(255) NOT NULL,
+  update BYTEA NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
+);
