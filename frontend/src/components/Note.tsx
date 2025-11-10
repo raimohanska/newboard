@@ -1,9 +1,8 @@
 import { memo } from 'react';
-import * as Y from 'yjs';
 import styled from 'styled-components';
 import { useItem } from '../hooks/useItemStore';
-import { useYText } from '../hooks/useYText';
 import { QuillEditor } from './QuillEditor';
+import { PlainTextView } from './PlainTextView';
 import { useIsSelectedByOthers } from '../hooks/useIsSelectedByOthers';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
@@ -31,32 +30,6 @@ interface NoteContentProps {
   isDragging: boolean;
   isSelected: boolean;
 }
-
-const PlainTextViewContainer = styled.div`
-  width: 100%;
-  padding: 8px 0;
-  font-size: 14px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: #333;
-  min-height: 30px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-`;
-
-interface PlainTextViewProps {
-  yText: Y.Text;
-}
-
-const PlainTextView = memo(({ yText }: PlainTextViewProps) => {
-  const plainText = useYText(yText);
-  
-  return (
-    <PlainTextViewContainer>
-      {plainText || <span style={{ color: '#999' }}>Type here...</span>}
-    </PlainTextViewContainer>
-  );
-});
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
   const note = useItem(noteId) as NoteType;
