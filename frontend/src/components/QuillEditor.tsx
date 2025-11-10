@@ -16,10 +16,18 @@ const EditorContainer = styled.div`
   border: none !important;
 
   .ql-editor {
-    padding: 0;
+    padding: 8px 0;
     min-height: 30px;
     cursor: text;
     position: relative;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  
+  .ql-editor p {
+    margin: 0;
   }
 `;
 

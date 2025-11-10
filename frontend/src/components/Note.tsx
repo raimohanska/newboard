@@ -36,10 +36,12 @@ const PlainTextViewContainer = styled.div`
   width: 100%;
   padding: 8px 0;
   font-size: 14px;
+  line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
   color: #333;
   min-height: 30px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 `;
 
 interface PlainTextViewProps {
