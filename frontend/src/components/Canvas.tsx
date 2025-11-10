@@ -32,27 +32,19 @@ export const Canvas = memo((() => {
       // Check if clicking on canvas (not on a note)
       if (e.target !== e.currentTarget) return;
 
-      // Check for modifier keys (Ctrl, Cmd, or Alt)
-      const isModifierPressed = e.ctrlKey || e.metaKey || e.altKey;
+      // Start rectangular selection on canvas drag
+      e.preventDefault();
+      const scrollWrapper = canvasRef.current?.parentElement?.parentElement;
+      if (!scrollWrapper) return;
 
-      if (isModifierPressed) {
-        // Start rectangular selection
-        e.preventDefault();
-        const scrollWrapper = canvasRef.current?.parentElement?.parentElement;
-        if (!scrollWrapper) return;
+      // Get zoom from store at interaction time (not reactive)
+      const zoom = store.getState().workspace.zoom;
 
-        // Get zoom from store at interaction time (not reactive)
-        const zoom = store.getState().workspace.zoom;
+      const wrapperRect = scrollWrapper.getBoundingClientRect();
+      const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
+      const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
 
-        const wrapperRect = scrollWrapper.getBoundingClientRect();
-        const x = (e.clientX - wrapperRect.left + scrollWrapper.scrollLeft) / zoom;
-        const y = (e.clientY - wrapperRect.top + scrollWrapper.scrollTop) / zoom;
-
-        dispatch(startSelectionBox({ x, y }));
-      } else {
-        // Clear selection on regular click
-        dispatch(clearSelection());
-      }
+      dispatch(startSelectionBox({ x, y }));
     };
 
     return (
