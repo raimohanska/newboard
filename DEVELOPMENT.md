@@ -62,6 +62,13 @@ npm run migrate:create add-users-table
 npm run migrate:up
 ```
 
+### Docker
+
+```bash
+npm run docker:build         # Build production Docker image
+npm run docker:run           # Run standalone container
+```
+
 ## Project Structure
 
 ```

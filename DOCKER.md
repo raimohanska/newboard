@@ -122,6 +122,58 @@ docker-compose ps             # Check health status
 
 Database data is stored in a Docker volume named `newboard_postgres_data`. This volume persists even when containers are stopped or removed (unless you use `docker-compose down -v`).
 
+## Production Docker Deployment
+
+The application can be fully containerized for production using Docker.
+
+### Quick Production Start
+
+```bash
+# 1. Set environment variables
+export POSTGRES_PASSWORD=your-secure-password
+export PORT=1234
+
+# 2. Build and start all services
+npm run docker:prod
+
+# 3. Check logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+# 4. Stop services
+npm run docker:prod:down
+```
+
+### Production Docker Commands
+
+```bash
+# Build image
+npm run docker:build
+
+# Start with Docker Compose (includes PostgreSQL)
+npm run docker:prod
+
+# Stop services
+npm run docker:prod:down
+
+# Run standalone (requires external database)
+npm run docker:run
+```
+
+### Production Architecture
+
+When running with `docker-compose.prod.yml`:
+- **app** container: Node.js server (frontend + backend + WebSocket)
+- **postgres** container: PostgreSQL database
+- Isolated network: `newboard-network`
+- Persistent volume: `postgres_data_prod`
+
+### Environment Variables
+
+Required for production:
+- `POSTGRES_PASSWORD`: PostgreSQL password
+- `DATABASE_URL`: Auto-computed in docker-compose, or set manually
+- `PORT`: Server port (default: 1234)
+
 ### Production Notes
 
 ⚠️ **IMPORTANT:** The default credentials are for development only. In production:
@@ -130,4 +182,6 @@ Database data is stored in a Docker volume named `newboard_postgres_data`. This 
 - Enable SSL connections
 - Configure proper access controls
 - Use connection pooling
+- Set up proper backup strategy
+- Monitor resource usage
 

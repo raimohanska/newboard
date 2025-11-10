@@ -2,14 +2,18 @@ node_modules
 npm-debug.log
 .git
 .gitignore
-*.md
+README.md
+DEVELOPMENT.md
+DOCKER.md
+agents/
 .env
 .env.local
-dist
-build
+.env.*.local
 coverage
 .DS_Store
 *.log
 .vscode
 .idea
+docker-compose.yml
+frontend/dist
 

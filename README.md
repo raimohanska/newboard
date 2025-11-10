@@ -57,28 +57,6 @@ Similar to Miro, but free and open source. We'll start with a simple whiteboard 
 For database management commands, see [DOCKER.md](./DOCKER.md).  
 For database migrations, see [backend/MIGRATIONS.md](./backend/MIGRATIONS.md).
 
-### Production Deployment
-
-1. **Build frontend:**
-   ```bash
-   npm run build
-   ```
-
-2. **Set environment variables:**
-   ```bash
-   export DATABASE_URL=postgresql://user:password@host:5432/database
-   export PORT=1234
-   ```
-
-3. **Start server:**
-   ```bash
-   npm start
-   ```
-   
-   Server runs at http://localhost:1234 (or your configured port) and serves both:
-   - Frontend application (HTTP)
-   - WebSocket server (WS)
-
 ## Technical implementation
 
 - Monorepo structure with `frontend/` and `backend/` directories

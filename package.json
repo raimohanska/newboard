@@ -18,7 +18,9 @@
     "db:psql": "docker-compose exec postgres psql -U newboard -d newboard",
     "migrate": "npm run migrate:up -w backend",
     "migrate:create": "npm run migrate:create -w backend --",
-    "migrate:up": "npm run migrate:up -w backend"
+    "migrate:up": "npm run migrate:up -w backend",
+    "docker:build": "docker build -t newboard:latest .",
+    "docker:run": "docker run -p 1234:1234 --env-file .env newboard:latest"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
