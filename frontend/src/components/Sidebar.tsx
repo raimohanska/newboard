@@ -21,17 +21,6 @@ const Title = styled.h2`
   color: #333;
 `;
 
-const Counter = styled.div`
-  margin-bottom: 20px;
-  padding: 10px;
-  background: white;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-  color: #666;
-  text-align: center;
-`;
-
 const DraggableNote = styled.div<{ $isDragging: boolean }>`
   width: 120px;
   height: 100px;
@@ -43,6 +32,7 @@ const DraggableNote = styled.div<{ $isDragging: boolean }>`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
+  text-align: center;
   justify-content: center;
   font-size: 14px;
   color: #666;
@@ -94,9 +84,7 @@ const TestButton = styled.button`
 export const Sidebar = () => {
   const dispatch = useDispatch();
   const { itemStore } = useWorkspace();
-  const itemIds = useItemIds();
   const zoom = useSelector((state: RootState) => state.workspace.zoom);
-  const noteCount = itemIds.length;
   
   const [isDragging, setIsDragging] = useState(false);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
@@ -179,15 +167,12 @@ export const Sidebar = () => {
   return (
     <>
       <SidebarContainer>
-        <Title>Elements</Title>
-        <Counter>
-          {noteCount} {noteCount === 1 ? 'note' : 'notes'}
-        </Counter>
+        <Title>Toolbar</Title>
         <DraggableNote
           $isDragging={isDragging}
           onMouseDown={handleMouseDown}
         >
-          Note
+          Drag me to the canvas!
         </DraggableNote>
         <TestButton onClick={handleAddTestItems}>
           Add 1000 Notes
