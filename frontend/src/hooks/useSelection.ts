@@ -1,59 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useAwarenessState } from './useAwarenessState';
 import { Awareness } from 'y-quill';
 
 export function useSelectedIds(): string[] {
-  const { itemStore } = useWorkspace();
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    const awareness = itemStore.getAwareness();
-    if (!awareness) {
-      setSelectedIds([]);
-      return;
-    }
-
-    const updateSelection = () => {
-      const localState = awareness.getLocalState();
-      setSelectedIds(localState?.selectedNoteIds || []);
-    };
-
-    updateSelection();
-    awareness.on('change', updateSelection);
-
-    return () => {
-      awareness.off('change', updateSelection);
-    };
-  }, [itemStore]);
-
-  return selectedIds;
+  return useAwarenessState<string[]>('selectedNoteIds', []);
 }
 
 export function useIsSelected(itemId: string): boolean {
-  const { itemStore } = useWorkspace();
-  const [isSelected, setIsSelected] = useState(false);
-
-  useEffect(() => {
-    const awareness = itemStore.getAwareness();
-    if (!awareness) {
-      setIsSelected(false);
-      return;
-    }
-
-    const updateSelection = () => {
-      const selectedIds = getSelectedIds(awareness);
-      setIsSelected(selectedIds.includes(itemId));
-    };
-
-    updateSelection();
-    awareness.on('change', updateSelection);
-
-    return () => {
-      awareness.off('change', updateSelection);
-    };
-  }, [itemId, itemStore]);
-
-  return isSelected;
+  const selectedIds = useAwarenessState<string[]>('selectedNoteIds', []);
+  return selectedIds.includes(itemId);
 }
 
 export function getSelectedIds(awareness: Awareness) {

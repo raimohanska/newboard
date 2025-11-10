@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useAwarenessState } from './useAwarenessState';
 
 interface SelectionBox {
   isActive: boolean;
@@ -9,40 +9,16 @@ interface SelectionBox {
   endY: number;
 }
 
+const defaultSelectionBox: SelectionBox = {
+  isActive: false,
+  startX: 0,
+  startY: 0,
+  endX: 0,
+  endY: 0,
+};
+
 export function useSelectionBox(): SelectionBox {
-  const { itemStore } = useWorkspace();
-  const [selectionBox, setSelectionBox] = useState<SelectionBox>({
-    isActive: false,
-    startX: 0,
-    startY: 0,
-    endX: 0,
-    endY: 0,
-  });
-
-  useEffect(() => {
-    const awareness = itemStore.getAwareness();
-    if (!awareness) return;
-
-    const updateSelectionBox = () => {
-      const localState = awareness.getLocalState();
-      setSelectionBox(localState?.selectionBox || {
-        isActive: false,
-        startX: 0,
-        startY: 0,
-        endX: 0,
-        endY: 0,
-      });
-    };
-
-    updateSelectionBox();
-    awareness.on('change', updateSelectionBox);
-
-    return () => {
-      awareness.off('change', updateSelectionBox);
-    };
-  }, [itemStore]);
-
-  return selectionBox;
+  return useAwarenessState<SelectionBox>('selectionBox', defaultSelectionBox);
 }
 
 export function useUpdateSelectionBox() {
