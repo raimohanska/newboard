@@ -1,8 +1,12 @@
 ## Newboard
 
-Online whiteboard tool to create and share diagrams, charts, and notes with others.
+An experimental online whiteboard tool to create and share diagrams, charts, and notes with others.
 
-Similar to Miro, but free and open source. We'll start with a simple whiteboard and then add more features as we go.
+Status: development, only supports yellow sticky notes
+
+Demo at https://newboard.fly.dev/
+
+This is an experiment on recreating something like ourboard.io but with a standard React stack and Y.js CRDT for document storage. It's also an experiment on AI assisted coding - I haven't written many lines of code manually here, but mostly instructing Cursor how to proceed in small batches.
 
 ## Features
 
