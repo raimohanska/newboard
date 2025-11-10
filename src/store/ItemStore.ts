@@ -17,7 +17,7 @@ class ItemStore {
   }
 
   private loadFromStorage() {
-    const STORAGE_KEY = 'newboard-yjs-v2';
+    const STORAGE_KEY = 'newboard-yjs-v3'; // Changed version for new structure
     const storedData = localStorage.getItem(STORAGE_KEY);
     if (storedData) {
       try {
@@ -31,7 +31,7 @@ class ItemStore {
   }
 
   private setupPersistence() {
-    const STORAGE_KEY = 'newboard-yjs-v2';
+    const STORAGE_KEY = 'newboard-yjs-v3';
     this.ydoc.on('update', () => {
       const update = Y.encodeStateAsUpdate(this.ydoc);
       const updateArray = Array.from(update);
@@ -42,10 +42,9 @@ class ItemStore {
   private yMapToItem(ymap: Y.Map<any>): CanvasItem {
     const type = ymap.get('type');
     const id = ymap.get('id');
-    const posMap = ymap.get('position') as Y.Map<number>;
     const position = {
-      x: posMap.get('x') || 0,
-      y: posMap.get('y') || 0,
+      x: ymap.get('x') || 0,
+      y: ymap.get('y') || 0,
     };
     
     if (type === 'Note') {
@@ -72,11 +71,8 @@ class ItemStore {
     const ymap = new Y.Map();
     ymap.set('id', item.id);
     ymap.set('type', item.type);
-    
-    const posMap = new Y.Map();
-    posMap.set('x', item.position.x);
-    posMap.set('y', item.position.y);
-    ymap.set('position', posMap);
+    ymap.set('x', item.position.x);
+    ymap.set('y', item.position.y);
     
     if (item.type === 'Note') {
       // Item already has Y.Text reference
@@ -116,11 +112,8 @@ class ItemStore {
       itemIds.forEach(id => {
         const ymap = this.yItems.get(id);
         if (ymap) {
-          const posMap = ymap.get('position') as Y.Map<number>;
-          if (posMap) {
-            posMap.set('x', (posMap.get('x') || 0) + deltaX);
-            posMap.set('y', (posMap.get('y') || 0) + deltaY);
-          }
+          ymap.set('x', (ymap.get('x') || 0) + deltaX);
+          ymap.set('y', (ymap.get('y') || 0) + deltaY);
         }
       });
     });
