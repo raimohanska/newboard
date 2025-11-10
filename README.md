@@ -10,18 +10,62 @@ Similar to Miro, but free and open source. We'll start with a simple whiteboard 
 
 ## Tech Stack
 
+### Frontend
 - React
 - Vite
 - Styled components
-- Redux Toolkit
+- Redux Toolkit (UI state)
+- Y.js (collaborative data structures)
+- Quill (rich text editor)
+- React Router (workspace routing)
+
+### Backend
+- HocusPocus (Y.js WebSocket server)
+- Node.js
+- PostgreSQL (persistence)
+
+## Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Docker & Docker Compose
+
+### Development Setup
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Set environment variables (optional):**
+   ```bash
+   export DATABASE_URL=postgresql://newboard:newboard_dev_password@localhost:5432/newboard
+   export PORT=1234
+   ```
+   Note: These have sensible defaults, only set if you need to override.
+
+3. **Start development:**
+   ```bash
+   npm run dev
+   ```
+   This will:
+   - Start PostgreSQL (Docker container)
+   - Run database migrations automatically
+   - Start frontend dev server (http://localhost:5173)
+   - Start backend WebSocket server (ws://localhost:1234)
+
+For database management commands, see [DOCKER.md](./DOCKER.md).  
+For database migrations, see [backend/MIGRATIONS.md](./backend/MIGRATIONS.md).
 
 ## Technical implementation
 
-- Only frontend, no backend
+- Monorepo structure with `frontend/` and `backend/` directories
 - UI consists of a left sidebar and a main canvas
-- The main canvas contains CanvasItems, which currently contains only TextItems, which are like sticky notes
+- The main canvas contains CanvasItems (sticky notes with rich text)
 - The main canvas and items are rendered as HTML divs and have absolute positioning
 - Around the main canvas, there's a wrapper div that has overflow: scroll and is the size of the canvas. This is the scrollable area.
+- Y.js CRDTs provide real-time collaboration and local-first data sync
+- Each workspace has its own URL (`/w/{workspace-id}`) and isolated data
 
 ## Data model
 

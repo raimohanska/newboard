@@ -8,8 +8,16 @@
     "backend"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
-    "build": "npm run build -w frontend"
+    "dev": "npm run db:start && concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "build": "npm run build -w frontend",
+    "db:start": "docker-compose up -d",
+    "db:stop": "docker-compose down",
+    "db:logs": "docker-compose logs -f postgres",
+    "db:reset": "docker-compose down -v && docker-compose up -d",
+    "db:psql": "docker-compose exec postgres psql -U newboard -d newboard",
+    "migrate": "npm run migrate:up -w backend",
+    "migrate:create": "npm run migrate:create -w backend --",
+    "migrate:up": "npm run migrate:up -w backend"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

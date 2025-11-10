@@ -1,2 +1,9 @@
 node_modules
 
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Config overrides (if any)
+config.ts
