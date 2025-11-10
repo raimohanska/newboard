@@ -3,6 +3,7 @@ import { GlobalStyles } from './styles/GlobalStyles';
 import { Sidebar } from './components/Sidebar';
 import { ScrollWrapper } from './components/ScrollWrapper';
 import { useDeleteSelectedItems } from './hooks/useDeleteSelectedItems';
+import { useUndoRedo } from './hooks/useUndoRedo';
 
 const AppContainer = styled.div`
   display: flex;
@@ -12,6 +13,7 @@ const AppContainer = styled.div`
 
 function App() {
   useDeleteSelectedItems();
+  useUndoRedo();
 
   return (
     <>

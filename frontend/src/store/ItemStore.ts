@@ -9,12 +9,17 @@ class ItemStore {
   private ydoc: Y.Doc;
   private yItems: Y.Map<Y.Map<any>>;
   private provider: HocuspocusProvider | null = null;
+  private undoManager: Y.UndoManager;
 
   constructor() {
     this.ydoc = new Y.Doc();
     this.yItems = this.ydoc.getMap<Y.Map<any>>('items');
-
+    
     this.loadFromStorage();
+    
+    // Initialize UndoManager to track changes to yItems (including nested changes)
+    this.undoManager = new Y.UndoManager(this.yItems);
+
     this.setupPersistence();
     this.setupProvider();
   }
@@ -140,6 +145,23 @@ class ItemStore {
         this.yItems.delete(id);
       });
     });
+  }
+
+  // Undo/Redo API
+  undo(): void {
+    this.undoManager.undo();
+  }
+
+  redo(): void {
+    this.undoManager.redo();
+  }
+
+  canUndo(): boolean {
+    return this.undoManager.canUndo();
+  }
+
+  canRedo(): boolean {
+    return this.undoManager.canRedo();
   }
 
   // Subscription API for React hooks
