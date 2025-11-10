@@ -32,7 +32,7 @@ class ItemStore {
     const wsHost = window.location.hostname;
     const wsPort = window.location.port;
     const wsUrl = wsPort 
-      ? `${wsProtocol}//${wsHost}:${wsPort}`
+      ? `${wsProtocol}//${wsHost}:${1234}`
       : `${wsProtocol}//${wsHost}`;
 
     // Connect to HocusPocus server with workspace-specific room
