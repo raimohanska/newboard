@@ -59,5 +59,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://localhost:1234', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
 # Start server (tsx runs TypeScript)
-CMD ["./node_modules/.bin/tsx", "backend/server.ts"]
+CMD ["./node_modules/.bin/tsx", "backend/src/server.ts"]
 

@@ -108,4 +108,3 @@ export class PostgreSqlPersistence implements Extension {
     await this.pool.end();
   }
 }
-

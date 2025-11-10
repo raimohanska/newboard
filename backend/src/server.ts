@@ -17,7 +17,7 @@ async function runMigrations() {
     await runner({
       databaseUrl: config.database.url,
       migrationsTable: 'pgmigrations',
-      dir: join(__dirname, 'migrations'),
+      dir: join(__dirname, '..', 'migrations'),
       direction: 'up',
       verbose: true,
     });
@@ -36,7 +36,7 @@ async function startServer() {
   const httpServer = createServer(app);
 
   // Serve static frontend files
-  const frontendDistPath = join(__dirname, '..', 'frontend', 'dist');
+  const frontendDistPath = join(__dirname, '..', '..', 'frontend', 'dist');
   app.use(express.static(frontendDistPath));
 
   // SPA fallback - serve index.html for all other routes
@@ -75,4 +75,3 @@ async function startServer() {
 }
 
 startServer().catch(console.error);
-
