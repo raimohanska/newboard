@@ -1,6 +1,8 @@
 import { memo } from 'react';
+import * as Y from 'yjs';
 import styled from 'styled-components';
 import { useItem } from '../hooks/useItemStore';
+import { useYText } from '../hooks/useYText';
 import { QuillEditor } from './QuillEditor';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
@@ -29,6 +31,30 @@ interface NoteContentProps {
   isSelected: boolean;
 }
 
+const PlainTextViewContainer = styled.div`
+  width: 100%;
+  padding: 8px 0;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #333;
+  min-height: 30px;
+`;
+
+interface PlainTextViewProps {
+  yText: Y.Text;
+}
+
+const PlainTextView = memo(({ yText }: PlainTextViewProps) => {
+  const plainText = useYText(yText);
+  
+  return (
+    <PlainTextViewContainer>
+      {plainText || <span style={{ color: '#999' }}>Type here...</span>}
+    </PlainTextViewContainer>
+  );
+});
+
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
   const note = useItem(noteId) as NoteType;
   
@@ -39,7 +65,11 @@ const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) 
       $isDragging={isDragging}
       $isSelected={isSelected}
     >
-      <QuillEditor yText={note.content} />
+      {isSelected ? (
+        <QuillEditor yText={note.content} />
+      ) : (
+        <PlainTextView yText={note.content} />
+      )}
     </NoteContainer>
   );
 });

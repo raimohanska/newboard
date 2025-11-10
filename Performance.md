@@ -17,6 +17,7 @@
 5. Consider CSS `content-visibility: auto`, which might speed things up given that painting is a bottleneck
 6. Minimize the components that are rendered. For instance, if only position is changed, use a separate memoized inner components for the content that doesn't need re-rendering.
 7. Initialize expensive stuff only if your component is actually in viewport. Create an `useIsInViewPort` hook.
+8. Initialize expensize stuff only when needed. Quill for instance is expensive if instantiated for thousands of texts. You may use a simpler component for a read-only view.
 
 ## Performance measurements
 
