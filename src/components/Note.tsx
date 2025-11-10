@@ -1,8 +1,7 @@
 import { memo } from 'react';
 import styled from 'styled-components';
-import { itemStore } from '../store/ItemStore';
 import { useItem } from '../hooks/useItemStore';
-import { useNoteText } from '../hooks/useNoteText';
+import { QuillEditor } from './QuillEditor';
 import type { Note as NoteType } from '../types';
 import { ItemPositioner } from './ItemPositioner';
 
@@ -32,24 +31,15 @@ interface NoteContentProps {
 
 const NoteContent = memo(({ noteId, isDragging, isSelected }: NoteContentProps) => {
   const note = useItem(noteId) as NoteType;
-  const content = useNoteText(note?.content);
   
   if (!note) return null;
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    itemStore.updateItemContent(noteId, e.target.value);
-  };
 
   return (
     <NoteContainer
       $isDragging={isDragging}
       $isSelected={isSelected}
     >
-      <TextArea
-        value={content}
-        onChange={handleContentChange}
-        placeholder="Type here..."
-      />
+      <QuillEditor yText={note.content} />
     </NoteContainer>
   );
 });
@@ -74,14 +64,3 @@ const NoteContainer = styled.div<{ $isDragging: boolean; $isSelected: boolean }>
   }
 `;
 
-const TextArea = styled.textarea`
-  width: 100%;
-  min-height: 30px;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 14px;
-  font-family: inherit;
-  resize: none;
-  cursor: text;
-`;

@@ -46,7 +46,14 @@ export const ItemPositioner = ({ itemId, children }: ItemPositionerProps) => {
     : item.position;
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
+    const target = e.target as HTMLElement;
+    
+    // Don't intercept clicks on editor elements
+    if (
+      target.tagName === 'TEXTAREA' ||
+      target.closest('.ql-editor') ||
+      target.closest('.ql-container')
+    ) {
       return;
     }
     

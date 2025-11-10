@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import App from './App';
-// Y.js handles persistence automatically via src/store/yjs.ts
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
